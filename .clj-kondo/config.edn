@@ -1,0 +1,6 @@
+{:linters {:consistent-alias
+           {:level :warning
+            :aliases {clojure.java.io io
+                      clojure.spec.alpha s
+                      clojure.set set
+                      clojure.string str}}}}
