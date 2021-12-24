@@ -1,5 +1,8 @@
 package org.slf4j.impl;
 
+import clojure.lang.IFn;
+import clojure.lang.RT;
+import clojure.lang.Symbol;
 import dialog.logger.DialogFactory;
 import org.slf4j.ILoggerFactory;
 
@@ -19,6 +22,22 @@ public final class StaticLoggerBinder {
 
 
     /**
+     * Initialized logger factory.
+     */
+    private final DialogFactory factory;
+
+
+    /**
+     * Private constructor.
+     *
+     * @param factory  constructed logger factory
+     */
+    private StaticLoggerBinder(DialogFactory factory) {
+        this.factory = factory;
+    }
+
+
+    /**
      * Wrapper class to efficiently ensure the singleton is only created once.
      */
     private static class Singleton {
@@ -26,17 +45,26 @@ public final class StaticLoggerBinder {
         private static final StaticLoggerBinder instance;
 
         static {
-            // TODO: resolve and initialize clojure references
-            instance = new StaticLoggerBinder();
+            IFn resolve = RT.var("clojure.core", "requiring-resolve");
+
+            // Load configuration.
+            Symbol initConfigName = Symbol.intern("dialog.config", "load-config");
+            IFn initConfig = (IFn)resolve.invoke(initConfigName);
+            Object config = initConfig.invoke();
+
+            // Resolve enabled fn.
+            Symbol isEnabledName = Symbol.intern("dialog.logger", "enabled?");
+            IFn isEnabled = (IFn)resolve.invoke(isEnabledName);
+
+            // Resolve log event fn.
+            Symbol logEventName = Symbol.intern("dialog.logger", "log-event");
+            IFn logEvent = (IFn)resolve.invoke(logEventName);
+
+            // Construct singleton
+            DialogFactory factory = new DialogFactory(config, isEnabled, logEvent);
+            instance = new StaticLoggerBinder(factory);
         }
 
-    }
-
-
-    /**
-     * Private constructor.
-     */
-    private StaticLoggerBinder() {
     }
 
 
@@ -66,8 +94,7 @@ public final class StaticLoggerBinder {
      * @return logger factory
      */
     public ILoggerFactory getLoggerFactory() {
-        // TODO: initialize factory with Clojure references
-        return new DialogFactory();
+        return factory;
     }
 
 }

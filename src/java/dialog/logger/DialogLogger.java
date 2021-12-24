@@ -1,5 +1,6 @@
 package dialog.logger;
 
+import clojure.lang.IFn;
 import clojure.lang.Keyword;
 import org.slf4j.Logger;
 import org.slf4j.Marker;
@@ -25,13 +26,36 @@ public final class DialogLogger implements Logger {
 
 
     /**
+     * Logging configuration map.
+     */
+    private final Object config;
+
+
+    /**
+     * Log level enabled check.
+     */
+    private final IFn isEnabledFn;
+
+
+    /**
+     * Log event entry.
+     */
+    private final IFn logEventFn;
+
+
+    /**
      * Construct a new logger.
      *
-     * @param name  logger name, typically the full class name or namespace
+     * @param name         logger name, typically the full class name or namespace
+     * @param config       logging configuration map
+     * @param isEnabledFn  function to check whether the logger is enabled
+     * @param logEventFn   function to log an event
      */
-    protected DialogLogger(String name) {
+    protected DialogLogger(String name, Object config, IFn isEnabledFn, IFn logEventFn) {
         this.name = name;
-        // TODO: more configuration...
+        this.config = config;
+        this.isEnabledFn = isEnabledFn;
+        this.logEventFn = logEventFn;
     }
 
 
@@ -50,8 +74,7 @@ public final class DialogLogger implements Logger {
      * @return true if the logger should send messages at this level
      */
     private boolean isEnabled(Keyword level) {
-        // TODO: implement
-        return true;
+        return (Boolean)isEnabledFn.invoke(config, name, level);
     }
 
 
@@ -59,12 +82,11 @@ public final class DialogLogger implements Logger {
      * Core method which passes logged messages into the Clojure code.
      *
      * @param level  log level keyword
-     * @param err    throwable exception associated with the message
      * @param msg    log message
+     * @param err    throwable exception associated with the message
      */
-    private void logMessage(Keyword level, Throwable err, String msg) {
-        // TODO: implement
-        System.out.println(level.toString() + "\t" + msg);
+    private void logMessage(Keyword level, String msg, Throwable err) {
+        logEventFn.invoke(config, msg, err);
     }
 
 
@@ -85,7 +107,7 @@ public final class DialogLogger implements Logger {
     @Override
     public void trace(String msg) {
         if (isEnabled(TRACE)) {
-            logMessage(TRACE, null, msg);
+            logMessage(TRACE, msg, null);
         }
     }
 
@@ -93,7 +115,7 @@ public final class DialogLogger implements Logger {
     @Override
     public void trace(String format, Object arg) {
         if (isEnabled(TRACE)) {
-            logMessage(TRACE, null, String.format(format, arg));
+            logMessage(TRACE, String.format(format, arg), null);
         }
     }
 
@@ -101,7 +123,7 @@ public final class DialogLogger implements Logger {
     @Override
     public void trace(String format, Object arg1, Object arg2) {
         if (isEnabled(TRACE)) {
-            logMessage(TRACE, null, String.format(format, arg1, arg2));
+            logMessage(TRACE, String.format(format, arg1, arg2), null);
         }
     }
 
@@ -109,15 +131,15 @@ public final class DialogLogger implements Logger {
     @Override
     public void trace(String format, Object... args) {
         if (isEnabled(TRACE)) {
-            logMessage(TRACE, null, String.format(format, args));
+            logMessage(TRACE, String.format(format, args), null);
         }
     }
 
 
     @Override
-    public void trace(String msg, Throwable t) {
+    public void trace(String msg, Throwable err) {
         if (isEnabled(TRACE)) {
-            logMessage(TRACE, t, msg);
+            logMessage(TRACE, msg, err);
         }
     }
 
@@ -125,7 +147,7 @@ public final class DialogLogger implements Logger {
     @Override
     public void trace(Marker marker, String msg) {
         if (isEnabled(TRACE)) {
-            logMessage(TRACE, null, msg);
+            logMessage(TRACE, msg, null);
         }
     }
 
@@ -133,7 +155,7 @@ public final class DialogLogger implements Logger {
     @Override
     public void trace(Marker marker, String format, Object arg) {
         if (isEnabled(TRACE)) {
-            logMessage(TRACE, null, String.format(format, arg));
+            logMessage(TRACE, String.format(format, arg), null);
         }
     }
 
@@ -141,7 +163,7 @@ public final class DialogLogger implements Logger {
     @Override
     public void trace(Marker marker, String format, Object arg1, Object arg2) {
         if (isEnabled(TRACE)) {
-            logMessage(TRACE, null, String.format(format, arg1, arg2));
+            logMessage(TRACE, String.format(format, arg1, arg2), null);
         }
     }
 
@@ -149,15 +171,15 @@ public final class DialogLogger implements Logger {
     @Override
     public void trace(Marker marker, String format, Object... args) {
         if (isEnabled(TRACE)) {
-            logMessage(TRACE, null, String.format(format, args));
+            logMessage(TRACE, String.format(format, args), null);
         }
     }
 
 
     @Override
-    public void trace(Marker marker, String msg, Throwable t) {
+    public void trace(Marker marker, String msg, Throwable err) {
         if (isEnabled(TRACE)) {
-            logMessage(TRACE, t, msg);
+            logMessage(TRACE, msg, err);
         }
     }
 
@@ -179,7 +201,7 @@ public final class DialogLogger implements Logger {
     @Override
     public void debug(String msg) {
         if (isEnabled(DEBUG)) {
-            logMessage(DEBUG, null, msg);
+            logMessage(DEBUG, msg, null);
         }
     }
 
@@ -187,7 +209,7 @@ public final class DialogLogger implements Logger {
     @Override
     public void debug(String format, Object arg) {
         if (isEnabled(DEBUG)) {
-            logMessage(DEBUG, null, String.format(format, arg));
+            logMessage(DEBUG, String.format(format, arg), null);
         }
     }
 
@@ -195,7 +217,7 @@ public final class DialogLogger implements Logger {
     @Override
     public void debug(String format, Object arg1, Object arg2) {
         if (isEnabled(DEBUG)) {
-            logMessage(DEBUG, null, String.format(format, arg1, arg2));
+            logMessage(DEBUG, String.format(format, arg1, arg2), null);
         }
     }
 
@@ -203,15 +225,15 @@ public final class DialogLogger implements Logger {
     @Override
     public void debug(String format, Object... args) {
         if (isEnabled(DEBUG)) {
-            logMessage(DEBUG, null, String.format(format, args));
+            logMessage(DEBUG, String.format(format, args), null);
         }
     }
 
 
     @Override
-    public void debug(String msg, Throwable t) {
+    public void debug(String msg, Throwable err) {
         if (isEnabled(DEBUG)) {
-            logMessage(DEBUG, t, msg);
+            logMessage(DEBUG, msg, err);
         }
     }
 
@@ -219,7 +241,7 @@ public final class DialogLogger implements Logger {
     @Override
     public void debug(Marker marker, String msg) {
         if (isEnabled(DEBUG)) {
-            logMessage(DEBUG, null, msg);
+            logMessage(DEBUG, msg, null);
         }
     }
 
@@ -227,7 +249,7 @@ public final class DialogLogger implements Logger {
     @Override
     public void debug(Marker marker, String format, Object arg) {
         if (isEnabled(DEBUG)) {
-            logMessage(DEBUG, null, String.format(format, arg));
+            logMessage(DEBUG, String.format(format, arg), null);
         }
     }
 
@@ -235,7 +257,7 @@ public final class DialogLogger implements Logger {
     @Override
     public void debug(Marker marker, String format, Object arg1, Object arg2) {
         if (isEnabled(DEBUG)) {
-            logMessage(DEBUG, null, String.format(format, arg1, arg2));
+            logMessage(DEBUG, String.format(format, arg1, arg2), null);
         }
     }
 
@@ -243,15 +265,15 @@ public final class DialogLogger implements Logger {
     @Override
     public void debug(Marker marker, String format, Object... args) {
         if (isEnabled(DEBUG)) {
-            logMessage(DEBUG, null, String.format(format, args));
+            logMessage(DEBUG, String.format(format, args), null);
         }
     }
 
 
     @Override
-    public void debug(Marker marker, String msg, Throwable t) {
+    public void debug(Marker marker, String msg, Throwable err) {
         if (isEnabled(DEBUG)) {
-            logMessage(DEBUG, t, msg);
+            logMessage(DEBUG, msg, err);
         }
     }
 
@@ -273,7 +295,7 @@ public final class DialogLogger implements Logger {
     @Override
     public void info(String msg) {
         if (isEnabled(INFO)) {
-            logMessage(INFO, null, msg);
+            logMessage(INFO, msg, null);
         }
     }
 
@@ -281,7 +303,7 @@ public final class DialogLogger implements Logger {
     @Override
     public void info(String format, Object arg) {
         if (isEnabled(INFO)) {
-            logMessage(INFO, null, String.format(format, arg));
+            logMessage(INFO, String.format(format, arg), null);
         }
     }
 
@@ -289,7 +311,7 @@ public final class DialogLogger implements Logger {
     @Override
     public void info(String format, Object arg1, Object arg2) {
         if (isEnabled(INFO)) {
-            logMessage(INFO, null, String.format(format, arg1, arg2));
+            logMessage(INFO, String.format(format, arg1, arg2), null);
         }
     }
 
@@ -297,15 +319,15 @@ public final class DialogLogger implements Logger {
     @Override
     public void info(String format, Object... args) {
         if (isEnabled(INFO)) {
-            logMessage(INFO, null, String.format(format, args));
+            logMessage(INFO, String.format(format, args), null);
         }
     }
 
 
     @Override
-    public void info(String msg, Throwable t) {
+    public void info(String msg, Throwable err) {
         if (isEnabled(INFO)) {
-            logMessage(INFO, t, msg);
+            logMessage(INFO, msg, err);
         }
     }
 
@@ -313,7 +335,7 @@ public final class DialogLogger implements Logger {
     @Override
     public void info(Marker marker, String msg) {
         if (isEnabled(INFO)) {
-            logMessage(INFO, null, msg);
+            logMessage(INFO, msg, null);
         }
     }
 
@@ -321,7 +343,7 @@ public final class DialogLogger implements Logger {
     @Override
     public void info(Marker marker, String format, Object arg) {
         if (isEnabled(INFO)) {
-            logMessage(INFO, null, String.format(format, arg));
+            logMessage(INFO, String.format(format, arg), null);
         }
     }
 
@@ -329,7 +351,7 @@ public final class DialogLogger implements Logger {
     @Override
     public void info(Marker marker, String format, Object arg1, Object arg2) {
         if (isEnabled(INFO)) {
-            logMessage(INFO, null, String.format(format, arg1, arg2));
+            logMessage(INFO, String.format(format, arg1, arg2), null);
         }
     }
 
@@ -337,15 +359,15 @@ public final class DialogLogger implements Logger {
     @Override
     public void info(Marker marker, String format, Object... args) {
         if (isEnabled(INFO)) {
-            logMessage(INFO, null, String.format(format, args));
+            logMessage(INFO, String.format(format, args), null);
         }
     }
 
 
     @Override
-    public void info(Marker marker, String msg, Throwable t) {
+    public void info(Marker marker, String msg, Throwable err) {
         if (isEnabled(INFO)) {
-            logMessage(INFO, t, msg);
+            logMessage(INFO, msg, err);
         }
     }
 
@@ -367,7 +389,7 @@ public final class DialogLogger implements Logger {
     @Override
     public void warn(String msg) {
         if (isEnabled(WARN)) {
-            logMessage(WARN, null, msg);
+            logMessage(WARN, msg, null);
         }
     }
 
@@ -375,7 +397,7 @@ public final class DialogLogger implements Logger {
     @Override
     public void warn(String format, Object arg) {
         if (isEnabled(WARN)) {
-            logMessage(WARN, null, String.format(format, arg));
+            logMessage(WARN, String.format(format, arg), null);
         }
     }
 
@@ -383,7 +405,7 @@ public final class DialogLogger implements Logger {
     @Override
     public void warn(String format, Object arg1, Object arg2) {
         if (isEnabled(WARN)) {
-            logMessage(WARN, null, String.format(format, arg1, arg2));
+            logMessage(WARN, String.format(format, arg1, arg2), null);
         }
     }
 
@@ -391,15 +413,15 @@ public final class DialogLogger implements Logger {
     @Override
     public void warn(String format, Object... args) {
         if (isEnabled(WARN)) {
-            logMessage(WARN, null, String.format(format, args));
+            logMessage(WARN, String.format(format, args), null);
         }
     }
 
 
     @Override
-    public void warn(String msg, Throwable t) {
+    public void warn(String msg, Throwable err) {
         if (isEnabled(WARN)) {
-            logMessage(WARN, t, msg);
+            logMessage(WARN, msg, err);
         }
     }
 
@@ -407,7 +429,7 @@ public final class DialogLogger implements Logger {
     @Override
     public void warn(Marker marker, String msg) {
         if (isEnabled(WARN)) {
-            logMessage(WARN, null, msg);
+            logMessage(WARN, msg, null);
         }
     }
 
@@ -415,7 +437,7 @@ public final class DialogLogger implements Logger {
     @Override
     public void warn(Marker marker, String format, Object arg) {
         if (isEnabled(WARN)) {
-            logMessage(WARN, null, String.format(format, arg));
+            logMessage(WARN, String.format(format, arg), null);
         }
     }
 
@@ -423,7 +445,7 @@ public final class DialogLogger implements Logger {
     @Override
     public void warn(Marker marker, String format, Object arg1, Object arg2) {
         if (isEnabled(WARN)) {
-            logMessage(WARN, null, String.format(format, arg1, arg2));
+            logMessage(WARN, String.format(format, arg1, arg2), null);
         }
     }
 
@@ -431,15 +453,15 @@ public final class DialogLogger implements Logger {
     @Override
     public void warn(Marker marker, String format, Object... args) {
         if (isEnabled(WARN)) {
-            logMessage(WARN, null, String.format(format, args));
+            logMessage(WARN, String.format(format, args), null);
         }
     }
 
 
     @Override
-    public void warn(Marker marker, String msg, Throwable t) {
+    public void warn(Marker marker, String msg, Throwable err) {
         if (isEnabled(WARN)) {
-            logMessage(WARN, t, msg);
+            logMessage(WARN, msg, err);
         }
     }
 
@@ -461,7 +483,7 @@ public final class DialogLogger implements Logger {
     @Override
     public void error(String msg) {
         if (isEnabled(ERROR)) {
-            logMessage(ERROR, null, msg);
+            logMessage(ERROR, msg, null);
         }
     }
 
@@ -469,7 +491,7 @@ public final class DialogLogger implements Logger {
     @Override
     public void error(String format, Object arg) {
         if (isEnabled(ERROR)) {
-            logMessage(ERROR, null, String.format(format, arg));
+            logMessage(ERROR, String.format(format, arg), null);
         }
     }
 
@@ -477,7 +499,7 @@ public final class DialogLogger implements Logger {
     @Override
     public void error(String format, Object arg1, Object arg2) {
         if (isEnabled(ERROR)) {
-            logMessage(ERROR, null, String.format(format, arg1, arg2));
+            logMessage(ERROR, String.format(format, arg1, arg2), null);
         }
     }
 
@@ -485,15 +507,15 @@ public final class DialogLogger implements Logger {
     @Override
     public void error(String format, Object... args) {
         if (isEnabled(ERROR)) {
-            logMessage(ERROR, null, String.format(format, args));
+            logMessage(ERROR, String.format(format, args), null);
         }
     }
 
 
     @Override
-    public void error(String msg, Throwable t) {
+    public void error(String msg, Throwable err) {
         if (isEnabled(ERROR)) {
-            logMessage(ERROR, t, msg);
+            logMessage(ERROR, msg, err);
         }
     }
 
@@ -501,7 +523,7 @@ public final class DialogLogger implements Logger {
     @Override
     public void error(Marker marker, String msg) {
         if (isEnabled(ERROR)) {
-            logMessage(ERROR, null, msg);
+            logMessage(ERROR, msg, null);
         }
     }
 
@@ -509,7 +531,7 @@ public final class DialogLogger implements Logger {
     @Override
     public void error(Marker marker, String format, Object arg) {
         if (isEnabled(ERROR)) {
-            logMessage(ERROR, null, String.format(format, arg));
+            logMessage(ERROR, String.format(format, arg), null);
         }
     }
 
@@ -517,7 +539,7 @@ public final class DialogLogger implements Logger {
     @Override
     public void error(Marker marker, String format, Object arg1, Object arg2) {
         if (isEnabled(ERROR)) {
-            logMessage(ERROR, null, String.format(format, arg1, arg2));
+            logMessage(ERROR, String.format(format, arg1, arg2), null);
         }
     }
 
@@ -525,15 +547,15 @@ public final class DialogLogger implements Logger {
     @Override
     public void error(Marker marker, String format, Object... args) {
         if (isEnabled(ERROR)) {
-            logMessage(ERROR, null, String.format(format, args));
+            logMessage(ERROR, String.format(format, args), null);
         }
     }
 
 
     @Override
-    public void error(Marker marker, String msg, Throwable t) {
+    public void error(Marker marker, String msg, Throwable err) {
         if (isEnabled(ERROR)) {
-            logMessage(ERROR, t, msg);
+            logMessage(ERROR, msg, err);
         }
     }
 
