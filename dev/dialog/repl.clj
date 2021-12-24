@@ -5,4 +5,5 @@
     [clojure.string :as str]
     [clojure.tools.logging :as ctl]
     [clojure.tools.namespace.repl :refer [refresh]]
+    [dialog.config :as config]
     [dialog.core :as log]))

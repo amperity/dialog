@@ -1,0 +1,52 @@
+;; Sample dialog configuration file. This is an EDN file read with Aero; the
+;; profile can be set with the JVM property `dialog.profile` or the environment
+;; variable `DIALOG_PROFILE`. Generally, settings in the environment will take
+;; priority over settings as JVM properties.
+
+{;; Initialization function which is resolved and called at startup time with
+ ;; the configuration map. Should return an updated config map, and may perform
+ ;; any desired side-effects.
+ :init amperity.logging.core/initialize!
+
+ ;; Root logger level. Can be overridden at runtime with the JVM property
+ ;; `dialog.level` or the environment variable `DIALOG_LEVEL`.
+ :level :debug
+
+ ;; Individual logger levels. Can also be set at runtime with the JVM
+ ;; properties `dialog.level.<logger>` or the environment variables
+ ;; `DIALOG_LEVEL_<logger>`. Loggers use the most-specific level set in their
+ ;; name hierarchy.
+ :levels
+ {"amperity" #profile {:repl :debug
+                       :default :info}
+  "vault" :info
+  ,,,}
+
+ ;; Set of loggers which should never be output. Any messages sent to these
+ ;; will be dropped, no matter what their log level is set to.
+ :blocked
+ #profile {:main #{"org.apache.http"
+                   "org.apache.parquet"}
+           :default #{}}
+
+ ;; Collection of functions which will be called in order on log events before
+ ;; they are sent to the outputs. These functions may enrich the events with
+ ;; additional context, modify the data, remap fields, or even filter events
+ ;; by returning nil. Functions are called with the current configuration map
+ ;; and the event being processed.
+ :middleware
+ [amperity.logging.ken/middleware]
+
+ ;; Outputs to send log messages to, specified by a keyword and a configuration
+ ;; value. There are various ways to configure the outputs; see the
+ ;; documentation for more information on the various options.
+ :outputs
+ #profile {:test {}
+           :repl {:console {:type :print
+                            :format :pretty
+                            :timestamp "HH:mm:ss.SSS"}}
+           :main {:stdout {:type :print
+                           :stream :stdout
+                           :format :text}
+                  :loggly {:type :syslog
+                           :format :json}}}}
