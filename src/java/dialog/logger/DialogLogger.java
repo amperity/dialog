@@ -40,22 +40,22 @@ public final class DialogLogger implements Logger {
     /**
      * Log event entry.
      */
-    private final IFn logEventFn;
+    private final IFn logMessageFn;
 
 
     /**
      * Construct a new logger.
      *
-     * @param name         logger name, typically the full class name or namespace
-     * @param config       logging configuration map
-     * @param isEnabledFn  function to check whether the logger is enabled
-     * @param logEventFn   function to log an event
+     * @param name          logger name, typically the full class name or namespace
+     * @param config        logging configuration map
+     * @param isEnabledFn   function to check whether the logger is enabled
+     * @param logMessageFn  function to log an event
      */
-    protected DialogLogger(String name, Object config, IFn isEnabledFn, IFn logEventFn) {
+    protected DialogLogger(String name, Object config, IFn isEnabledFn, IFn logMessageFn) {
         this.name = name;
         this.config = config;
         this.isEnabledFn = isEnabledFn;
-        this.logEventFn = logEventFn;
+        this.logMessageFn = logMessageFn;
     }
 
 
@@ -86,7 +86,7 @@ public final class DialogLogger implements Logger {
      * @param err    throwable exception associated with the message
      */
     private void logMessage(Keyword level, String msg, Throwable err) {
-        logEventFn.invoke(config, msg, err);
+        logMessageFn.invoke(config, level, msg, err);
     }
 
 

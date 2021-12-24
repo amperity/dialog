@@ -21,33 +21,33 @@ public final class DialogFactory implements ILoggerFactory {
     /**
      * Log level enabled check.
      */
-    private final IFn isEnabled;
+    private final IFn isEnabledFn;
 
 
     /**
      * Log event entry.
      */
-    private final IFn logEvent;
+    private final IFn logMessageFn;
 
 
     /**
      * Construct a new logger factory.
      *
-     * @param config     initialized configuration
-     * @param isEnabled  function to check whether the logger is enabled
-     * @param logEvent   function to log an event
+     * @param config        initialized configuration
+     * @param isEnabledFn   function to check whether the logger is enabled
+     * @param logMessageFn  function to log an event
      */
-    public DialogFactory(Object config, IFn isEnabled, IFn logEvent) {
+    public DialogFactory(Object config, IFn isEnabledFn, IFn logMessageFn) {
         this.config = config;
-        this.isEnabled = isEnabled;
-        this.logEvent = logEvent;
+        this.isEnabledFn = isEnabledFn;
+        this.logMessageFn = logMessageFn;
     }
 
 
     @Override
     public DialogLogger getLogger(String name) {
         // TODO: cache loggers?
-        return new DialogLogger(name, config, isEnabled, logEvent);
+        return new DialogLogger(name, config, isEnabledFn, logMessageFn);
     }
 
 }

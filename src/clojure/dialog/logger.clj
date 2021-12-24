@@ -5,7 +5,7 @@
 
 (defn enabled?
   "True if the given logger is enabled at the provided level."
-  [logger-name level]
+  [config logger-name level]
   ;; TODO: implement
   true)
 
@@ -15,3 +15,12 @@
   [config event]
   ;; TODO: implement
   (printf (prn-str event)))
+
+
+(defn log-message
+  "Pass a message into the logging system. Used primarily by the SLF4J logging
+  integration."
+  [config level msg err]
+  (log-event config {:level level
+                     :message msg
+                     :error err}))

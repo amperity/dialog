@@ -57,11 +57,11 @@ public final class StaticLoggerBinder {
             IFn isEnabled = (IFn)resolve.invoke(isEnabledName);
 
             // Resolve log event fn.
-            Symbol logEventName = Symbol.intern("dialog.logger", "log-event");
-            IFn logEvent = (IFn)resolve.invoke(logEventName);
+            Symbol logMessageName = Symbol.intern("dialog.logger", "log-message");
+            IFn logMessage = (IFn)resolve.invoke(logMessageName);
 
             // Construct singleton
-            DialogFactory factory = new DialogFactory(config, isEnabled, logEvent);
+            DialogFactory factory = new DialogFactory(config, isEnabled, logMessage);
             instance = new StaticLoggerBinder(factory);
         }
 
