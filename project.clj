@@ -4,14 +4,15 @@
   :license {:name "MIT License"
             :url "https://mit-license.org/"}
 
-  :plugins
-  [[lein-cloverage "1.2.2"]]
-
   :dependencies
   [[org.clojure/clojure "1.10.3"]
    [org.clojure/data.json "2.4.0"]
-   [org.clojure/tools.logging "1.1.0"]
-   [com.amperity/ken "1.0.0"]]
+   [org.slf4j/slf4j-api "1.7.30"]
+   [org.slf4j/jul-to-slf4j "1.7.30"]
+   [org.slf4j/jcl-over-slf4j "1.7.30"]]
+
+  :source-paths ["src/clojure"]
+  :java-source-paths ["src/java"]
 
   :profiles
   {:repl
