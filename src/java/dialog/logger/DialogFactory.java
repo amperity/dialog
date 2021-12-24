@@ -11,15 +11,15 @@ public final class DialogFactory implements ILoggerFactory {
     /**
      * Construct a new logger factory.
      */
-    protected DialogFactory() {
+    public DialogFactory() {
         // TODO: configuration...
     }
 
 
     @Override
     public DialogLogger getLogger(String name) {
-        // TODO: implement
-        return null;
+        // TODO: wire in clojure references
+        return new DialogLogger(name);
     }
 
 }

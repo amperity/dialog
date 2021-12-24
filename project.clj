@@ -15,7 +15,10 @@
   :java-source-paths ["src/java"]
 
   :profiles
-  {:repl
+  {:dev
+   {:dependencies [[org.clojure/tools.logging "1.2.2"]]}
+
+   :repl
    {:source-paths ["dev"]
     :repl-options {:init-ns dialog.repl}
     :dependencies [[org.clojure/tools.namespace "1.1.0"]]

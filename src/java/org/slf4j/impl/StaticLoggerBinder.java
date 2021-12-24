@@ -19,6 +19,20 @@ public final class StaticLoggerBinder {
 
 
     /**
+     * Wrapper class to efficiently ensure the singleton is only created once.
+     */
+    private static class Singleton {
+
+        private static final StaticLoggerBinder instance;
+
+        static {
+            instance = new StaticLoggerBinder();
+        }
+
+    }
+
+
+    /**
      * Private constructor.
      */
     private StaticLoggerBinder() {
@@ -31,8 +45,7 @@ public final class StaticLoggerBinder {
      * @return singleton logger binder
      */
     public static final StaticLoggerBinder getSingleton() {
-        // TODO: singleton helper pattern?
-        return null;
+        return Singleton.instance;
     }
 
 
@@ -52,8 +65,8 @@ public final class StaticLoggerBinder {
      * @return logger factory
      */
     public ILoggerFactory getLoggerFactory() {
-        // TODO: implement
-        return null;
+        // TODO: initialize factory with Clojure references
+        return new DialogFactory();
     }
 
 }
