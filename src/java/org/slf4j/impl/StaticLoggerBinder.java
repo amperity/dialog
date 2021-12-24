@@ -26,6 +26,7 @@ public final class StaticLoggerBinder {
         private static final StaticLoggerBinder instance;
 
         static {
+            // TODO: resolve and initialize clojure references
             instance = new StaticLoggerBinder();
         }
 

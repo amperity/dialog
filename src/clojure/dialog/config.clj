@@ -50,26 +50,38 @@
              env)))))
 
 
-(defn- resolve-sym
-  "Safely resolve the given symbol to a function. Returns the function, or prints
+(defn- resolve-fn
+  "Safely resolve the given value to a function. Returns the function, or prints
   an error and returns nil."
-  [kind sym]
+  [kind x]
   (try
-    (or (requiring-resolve sym)
-        (print-err "%s function %s was not found"
-                   kind sym))
+    (cond
+      (fn? x)
+      x
+
+      (var? x)
+      x
+
+      (symbol? x)
+      (or (requiring-resolve x)
+          (print-err "%s function %s was not found"
+                     kind x))
+
+      :else
+      (print-err "%s function %s is not a known type: %s"
+                 kind x (class x)))
     (catch Exception ex
-      (print-err "%s function function %s could not be resolved: %s"
-                 kind sym (ex-message ex)))))
+      (print-err "%s function %s could not be resolved: %s"
+                 kind x (ex-message ex)))))
 
 
 (defn- resolve-middleware
   "Resolve any middleware symbols in the config to functions."
   [config]
-  (if-let [mw-syms (seq (:middleware config))]
+  (if-let [raw-mw (seq (:middleware config))]
     (let [middleware (into []
-                           (keep (partial resolve-sym "middleware"))
-                           mw-syms)]
+                           (keep (partial resolve-fn "middleware"))
+                           raw-mw)]
       (if (seq middleware)
         (assoc config :middleware middleware)
         (dissoc config :middleware)))
@@ -80,9 +92,19 @@
   "Resolve the initialization function, if set."
   [config]
   (if-let [init-sym (:init config)]
-    (if-let [init-fn (resolve-sym "init" init-sym)]
+    (if-let [init-fn (resolve-fn "init" init-sym)]
       (assoc config :init init-fn)
       (dissoc config :init))
+    config))
+
+
+(defn- apply-init
+  "Apply the initialization function to the config if present, producing an
+  updated config. Returning `nil` is interpreted as no changes."
+  [config]
+  (if-let [init-fn (:init config)]
+    (or (init-fn config)
+        config)
     config))
 
 
@@ -90,33 +112,40 @@
   "Expand an output configuration map into its full form and apply
   initialization."
   [[id output]]
-  (cond
-    ;; Expand keyword into basic map with default format.
-    (keyword? output)
-    [id
-     {:type output
-      :format :text}]
+  ;; Expand keyword into basic map with default format.
+  (let [output (if (keyword? output)
+                 {:type output
+                  :format :text}
+                 output)]
+    (cond
+      ;; Gracefully handle nil to mean omission.
+      (nil? output)
+      nil
 
-    ;; Gracefully handle nil to mean omission.
-    (nil? output)
-    nil
+      ;; Check that config has expected type.
+      (not (map? output))
+      (print-err "output %s has unknown configuration; expected a map: %s"
+                 id
+                 (pr-str output))
 
-    ;; Check that config has expected type.
-    (not (map? output))
-    (print-err "output %s has unknown configuration; expected a map: %s"
-               id
-               (pr-str output))
+      ;; Check that output type is understood.
+      (not (contains? #{:null :print :file :syslog}
+                      (:type output)))
+      (print-err "output %s has invalid type: %s"
+                 id
+                 (:type output))
 
-    ;; Check that output type is understood.
-    (not (contains? #{:null :print :file :syslog}
-                    (:type output)))
-    (print-err "output %s has invalid type: %s"
-               id
-               (:type output))
+      ;; Check that format type is understood.
+      ;; TODO: default to text?
+      (not (contains? #{:text :pretty :json}
+                      (:format output)))
+      (print-err "output %s has invalid format: %s"
+                 id
+                 (:format output))
 
-    ;; TODO: initialize
-    :else
-    [id (assoc output :fn (constantly false))]))
+      ;; TODO: initialize
+      :else
+      [id (assoc output :fn (constantly false))])))
 
 
 (defn- initialize-outputs
@@ -151,9 +180,6 @@
         (nil? (:outputs base-config))
         (assoc :outputs {:console :print}))
       (resolve-init)
-      (as-> cfg
-        (if-let [init-fn (:init cfg)]
-          (init-fn cfg)
-          cfg))
+      (apply-init)
       (resolve-middleware)
       (update :outputs initialize-outputs))))
