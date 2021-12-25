@@ -16,6 +16,11 @@
   :source-paths ["src/clojure"]
   :java-source-paths ["src/java"]
 
+  :hiera
+  {:cluster-depth 2
+   :vertical false
+   :show-external false}
+
   :profiles
   {:dev
    {:dependencies [[org.clojure/tools.logging "1.2.3"]]}
