@@ -1,6 +1,7 @@
 package dialog.logger;
 
 import clojure.lang.IFn;
+import java.util.concurrent.ConcurrentHashMap;
 import org.slf4j.ILoggerFactory;
 
 
@@ -9,13 +10,10 @@ import org.slf4j.ILoggerFactory;
  */
 public final class DialogFactory implements ILoggerFactory {
 
-    // TODO: should config be a class field?
-
-
     /**
-     * Logging configuration map.
+     * Logger cache.
      */
-    private final Object config;
+    private final ConcurrentHashMap<String,DialogLogger> cache;
 
 
     /**
@@ -33,12 +31,11 @@ public final class DialogFactory implements ILoggerFactory {
     /**
      * Construct a new logger factory.
      *
-     * @param config        initialized configuration
      * @param isEnabledFn   function to check whether the logger is enabled
      * @param logMessageFn  function to log an event
      */
-    public DialogFactory(Object config, IFn isEnabledFn, IFn logMessageFn) {
-        this.config = config;
+    public DialogFactory(IFn isEnabledFn, IFn logMessageFn) {
+        this.cache = new ConcurrentHashMap(64);
         this.isEnabledFn = isEnabledFn;
         this.logMessageFn = logMessageFn;
     }
@@ -46,8 +43,21 @@ public final class DialogFactory implements ILoggerFactory {
 
     @Override
     public DialogLogger getLogger(String name) {
-        // TODO: cache loggers?
-        return new DialogLogger(name, config, isEnabledFn, logMessageFn);
+        // Check for existing cached logger.
+        DialogLogger extant = cache.get(name);
+        if (extant != null) {
+            return extant;
+        }
+
+        // NOTE: this is subject to race conditions since we don't want to pay
+        // the cost of locking; however in the normal case most classes obtain
+        // loggers statically, so this is unlikely to actually produce
+        // duplicates. Even if it does, usage is still safe and the cost is
+        // minimal.
+        DialogLogger logger = new DialogLogger(name, isEnabledFn, logMessageFn);
+        cache.put(name, logger);
+
+        return logger;
     }
 
 }

@@ -26,12 +26,6 @@ public final class DialogLogger implements Logger {
 
 
     /**
-     * Logging configuration map.
-     */
-    private final Object config;
-
-
-    /**
      * Log level enabled check.
      */
     private final IFn isEnabledFn;
@@ -47,13 +41,11 @@ public final class DialogLogger implements Logger {
      * Construct a new logger.
      *
      * @param name          logger name, typically the full class name or namespace
-     * @param config        logging configuration map
      * @param isEnabledFn   function to check whether the logger is enabled
      * @param logMessageFn  function to log an event
      */
-    protected DialogLogger(String name, Object config, IFn isEnabledFn, IFn logMessageFn) {
+    protected DialogLogger(String name, IFn isEnabledFn, IFn logMessageFn) {
         this.name = name;
-        this.config = config;
         this.isEnabledFn = isEnabledFn;
         this.logMessageFn = logMessageFn;
     }
@@ -74,7 +66,7 @@ public final class DialogLogger implements Logger {
      * @return true if the logger should send messages at this level
      */
     private boolean isEnabled(Keyword level) {
-        return (Boolean)isEnabledFn.invoke(config, name, level);
+        return (Boolean)isEnabledFn.invoke(name, level);
     }
 
 
@@ -86,7 +78,7 @@ public final class DialogLogger implements Logger {
      * @param err    throwable exception associated with the message
      */
     private void logMessage(Keyword level, String msg, Throwable err) {
-        logMessageFn.invoke(config, level, msg, err);
+        logMessageFn.invoke(level, msg, err);
     }
 
 

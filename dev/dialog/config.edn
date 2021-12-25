@@ -44,9 +44,9 @@
  #profile {:test {}
            :repl {:console {:type :print
                             :format :pretty
-                            :timestamp "HH:mm:ss.SSS"}}
+                            :timestamp :short}}
            :main {:stdout {:type :print
                            :stream :stdout
-                           :format :text}
+                           :format :simple}
                   :loggly {:type :syslog
                            :format :json}}}}

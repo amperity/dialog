@@ -47,10 +47,10 @@ public final class StaticLoggerBinder {
         static {
             IFn resolve = RT.var("clojure.core", "requiring-resolve");
 
-            // Load configuration.
-            Symbol initConfigName = Symbol.intern("dialog.config", "load-config");
+            // Initialize configuration.
+            Symbol initConfigName = Symbol.intern("dialog.logger", "init-config!");
             IFn initConfig = (IFn)resolve.invoke(initConfigName);
-            Object config = initConfig.invoke();
+            initConfig.invoke();
 
             // Resolve enabled fn.
             Symbol isEnabledName = Symbol.intern("dialog.logger", "enabled?");
@@ -61,7 +61,7 @@ public final class StaticLoggerBinder {
             IFn logMessage = (IFn)resolve.invoke(logMessageName);
 
             // Construct singleton
-            DialogFactory factory = new DialogFactory(config, isEnabled, logMessage);
+            DialogFactory factory = new DialogFactory(isEnabled, logMessage);
             instance = new StaticLoggerBinder(factory);
         }
 

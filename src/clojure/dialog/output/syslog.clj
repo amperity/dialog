@@ -174,3 +174,13 @@
   ;; TODO: options to control address and port
   (let [conn (connect!)]
     (assoc opts :fn (partial write-message conn))))
+
+
+(defn writer
+  "Construct a syslog event writer function."
+  [output]
+  (let [conn (connect!)]
+    (fn write-event
+      [event payload]
+      ;; TODO: implement
+      ,,,)))

@@ -3,4 +3,10 @@
   consumption in a REPL console.")
 
 
-,,,
+(defn formatter
+  "Construct a pretty event formatting function."
+  [output]
+  (fn format-event
+    [event]
+    ;; TODO: implement
+    ,,,))

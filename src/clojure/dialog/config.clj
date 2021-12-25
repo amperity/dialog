@@ -3,7 +3,13 @@
   (:require
     [aero.core :as aero]
     [clojure.java.io :as io]
-    [clojure.string :as str]))
+    [clojure.string :as str]
+    [dialog.format.json :as fmt.json]
+    [dialog.format.pretty :as fmt.pretty]
+    [dialog.format.simple :as fmt.simple]
+    [dialog.output.file :as out.file]
+    [dialog.output.print :as out.print]
+    [dialog.output.syslog :as out.syslog]))
 
 
 (defn- print-err
@@ -103,8 +109,14 @@
   updated config. Returning `nil` is interpreted as no changes."
   [config]
   (if-let [init-fn (:init config)]
-    (or (init-fn config)
-        config)
+    (try
+      (or (init-fn config)
+          config)
+      (catch Exception ex
+        (print-err "error applying init function %s: %s"
+                   (.getName (class init-fn))
+                   (ex-message ex))
+        config))
     config))
 
 
@@ -115,7 +127,7 @@
   ;; Expand keyword into basic map with default format.
   (let [output (if (keyword? output)
                  {:type output
-                  :format :text}
+                  :format :simple}
                  output)]
     (cond
       ;; Gracefully handle nil to mean omission.
@@ -136,16 +148,25 @@
                  (:type output))
 
       ;; Check that format type is understood.
-      ;; TODO: default to text?
-      (not (contains? #{:text :pretty :json}
+      (not (contains? #{:message :simple :pretty :json}
                       (:format output)))
       (print-err "output %s has invalid format: %s"
                  id
                  (:format output))
 
-      ;; TODO: initialize
+      ;; Initialize format and output functions.
       :else
-      [id (assoc output :fn (constantly false))])))
+      [id (assoc output
+                 :formatter (case (:format output)
+                              :message :message
+                              :simple  (fmt.simple/formatter output)
+                              :pretty  (fmt.pretty/formatter output)
+                              :json    (fmt.json/formatter output))
+                 :writer (case (:type output)
+                           :null   nil
+                           :file   (out.file/writer output)
+                           :print  (out.print/writer output)
+                           :syslog (out.syslog/writer output)))])))
 
 
 (defn- initialize-outputs
@@ -165,7 +186,12 @@
                                            "dialog.config.profile"
                                            :default))
         base-config (if-let [config-edn (io/resource "dialog/config.edn")]
-                      (aero/read-config config-edn {:profile profile-key})
+                      (try
+                        (aero/read-config config-edn {:profile profile-key})
+                        (catch Exception ex
+                          (print-err "failed to read dialog config file: %s"
+                                     (ex-message ex))
+                          {:level :info}))
                       {:level :info})
         root-level (some-setting "DIALOG_LEVEL"
                                  "dialog.level"
