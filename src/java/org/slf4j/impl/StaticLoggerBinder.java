@@ -3,7 +3,14 @@ package org.slf4j.impl;
 import clojure.lang.IFn;
 import clojure.lang.RT;
 import clojure.lang.Symbol;
+
 import dialog.logger.DialogFactory;
+
+import java.util.logging.Level;
+import java.util.logging.LogManager;
+import java.util.logging.Logger;
+
+import org.slf4j.bridge.SLF4JBridgeHandler;
 import org.slf4j.ILoggerFactory;
 
 
@@ -63,6 +70,12 @@ public final class StaticLoggerBinder {
             // Construct singleton
             DialogFactory factory = new DialogFactory(isEnabled, logMessage);
             instance = new StaticLoggerBinder(factory);
+
+            // Configure JUL bridge
+            LogManager.getLogManager().reset();
+            SLF4JBridgeHandler.removeHandlersForRootLogger();
+            SLF4JBridgeHandler.install();
+            Logger.getGlobal().setLevel(Level.FINEST);
         }
 
     }
