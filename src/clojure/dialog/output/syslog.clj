@@ -141,10 +141,10 @@
         nil))))
 
 
-(defn- write-message
+(defn- write-packet!
   "Write a log event to the syslog socket. Returns true if the message was
   successfully delivered, false if not."
-  [conn event payload]
+  [conn event message]
   (let [{:keys [socket address port]} conn
         {:keys [level timestamp_ hostname_ context output-fn]} event
         ;; TODO: un-timbre this
@@ -154,7 +154,7 @@
                   (:sys context)
                   (:host context)
                   level
-                  payload)
+                  message)
         packet (DatagramPacket.
                  payload
                  (count payload)
@@ -170,17 +170,10 @@
         false))))
 
 
-(defn appender
-  "Construct a new appender which will write to the local syslog."
-  [opts]
-  (let [conn (connect!)]
-    (assoc opts :fn (partial write-message conn))))
-
-
 (defn writer
   "Construct a syslog event writer function."
   [output]
   (let [conn (connect! (:address output) (:port output))]
     (fn write-event
-      [event payload]
-      (write-message conn event payload))))
+      [event message]
+      (write-packet! conn event message))))

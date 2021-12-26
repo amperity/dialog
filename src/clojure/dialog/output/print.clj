@@ -5,9 +5,12 @@
 (defn writer
   "Construct a print event writer function."
   [output]
-  (fn write-event
-    [event payload]
-    (prn event)
-    (println payload)
-    ;; TODO: implement
-    ,,,))
+  (let [stream (case (:stream output)
+                 nil     *out*
+                 :stdout *out*
+                 :stderr *err*)]
+    (fn write-event
+      [_event message]
+      (binding [*out* stream]
+        (print (str message \newline))
+        (flush)))))
