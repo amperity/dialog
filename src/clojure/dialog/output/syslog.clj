@@ -117,11 +117,13 @@
 (defn- connect!
   "Open a connection to the local syslog daemon. Returns a map containing an
   open socket and address/port information on success, or nil on failure."
-  []
+  [address port]
   (try
     {:socket (DatagramSocket.)
-     :address (InetAddress/getLocalHost)
-     :port 514}
+     :address (if address
+                (InetAddress/getByName address)
+                (InetAddress/getLocalHost))
+     :port (or port 514)}
     (catch UnknownHostException ex
       (binding [*out* *err*]
         (println "Unable to resolve localhost for syslog")
@@ -142,9 +144,9 @@
 (defn- write-message
   "Write a log event to the syslog socket. Returns true if the message was
   successfully delivered, false if not."
-  [conn data]
+  [conn event payload]
   (let [{:keys [socket address port]} conn
-        {:keys [level timestamp_ hostname_ context output-fn]} data
+        {:keys [level timestamp_ hostname_ context output-fn]} event
         ;; TODO: un-timbre this
         payload (encode-payload
                   @timestamp_
@@ -152,7 +154,7 @@
                   (:sys context)
                   (:host context)
                   level
-                  (output-fn data))
+                  payload)
         packet (DatagramPacket.
                  payload
                  (count payload)
@@ -171,7 +173,6 @@
 (defn appender
   "Construct a new appender which will write to the local syslog."
   [opts]
-  ;; TODO: options to control address and port
   (let [conn (connect!)]
     (assoc opts :fn (partial write-message conn))))
 
@@ -179,8 +180,7 @@
 (defn writer
   "Construct a syslog event writer function."
   [output]
-  (let [conn (connect!)]
+  (let [conn (connect! (:address output) (:port output))]
     (fn write-event
       [event payload]
-      ;; TODO: implement
-      ,,,)))
+      (write-message conn event payload))))
