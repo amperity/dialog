@@ -5,4 +5,18 @@
     [clojure.string :as str]
     [clojure.tools.logging :as ctl]
     [clojure.tools.namespace.repl :refer [refresh]]
-    [dialog.config :as config]))
+    [dialog.config :as config]
+    [dialog.logger :as log]))
+
+
+(defn init!
+  "Initialize the logger state."
+  []
+  (log/initialize!))
+
+
+(defn reset
+  "Reset the REPL state, reloading code and ensuring the logger is
+  re-initialized."
+  []
+  (refresh :after 'dialog.repl/init!))

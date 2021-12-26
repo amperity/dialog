@@ -55,7 +55,7 @@ public final class StaticLoggerBinder {
             IFn resolve = RT.var("clojure.core", "requiring-resolve");
 
             // Initialize configuration.
-            Symbol initConfigName = Symbol.intern("dialog.logger", "init-config!");
+            Symbol initConfigName = Symbol.intern("dialog.logger", "initialize!");
             IFn initConfig = (IFn)resolve.invoke(initConfigName);
             initConfig.invoke();
 

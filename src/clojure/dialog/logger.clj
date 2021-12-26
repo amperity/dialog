@@ -9,7 +9,7 @@
   nil)
 
 
-(defn init-config!
+(defn initialize!
   "Load and initialize the logging system configuration."
   []
   (let [cfg (config/load-config)]
