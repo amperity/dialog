@@ -96,7 +96,7 @@ public final class DialogLogger implements Logger {
         Symbol isEnabledName = Symbol.intern("dialog.logger", "log-message");
         f = (IFn)resolve.invoke(isEnabledName);
 
-        f.invoke(level, msg, err);
+        f.invoke(name, level, msg, err);
     }
 
 

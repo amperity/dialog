@@ -6,7 +6,8 @@
     [clojure.tools.logging :as ctl]
     [clojure.tools.namespace.repl :refer [refresh]]
     [dialog.config :as config]
-    [dialog.logger :as log]))
+    [dialog.logger :as log]
+    [dialog.logger.util :as u]))
 
 
 (defn init!

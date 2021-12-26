@@ -1,5 +1,10 @@
 (ns dialog.logger.util
-  "Logging implementation utilities.")
+  "Logging implementation utilities."
+  (:require
+    [clojure.java.shell :as sh]
+    [clojure.string :as str])
+  (:import
+    java.net.InetAddress))
 
 
 ;; What do events look like?
@@ -24,9 +29,26 @@
  :thread "main"
  ;; (optional) Throwable error associated with this event.
  :error (ex-info "..." {,,,})
- ;; (optional) Preformatted "tail" to include in the event output.
- :extra "{:foo 123}"
+ ;; (optional) Any other fields
  ,,,}
+
+
+(let [hostname (delay
+        (or (try
+              (let [proc (sh/sh "hostname")]
+                (when (zero? (:exit proc))
+                  (str/trim (:out proc))))
+              (catch Exception _
+                nil))
+            (try
+              (.getHostName (InetAddress/getLocalHost))
+              (catch Exception _
+                nil))
+            "localhost"))]
+  (defn get-hostname
+    "Get the string name of the local host computer."
+    []
+    @hostname))
 
 
 ;; ## Throttled Error Reporting
