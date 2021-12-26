@@ -62,6 +62,6 @@
   "Pass a message into the logging system. Used primarily by the SLF4J logging
   integration."
   [level msg err]
-  (log-event config {:level level
-                     :message msg
-                     :error err}))
+  (log-event {:level level
+              :message msg
+              :error err}))

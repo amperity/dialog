@@ -35,7 +35,8 @@
  ;; by returning nil. Functions are called with the current configuration map
  ;; and the event being processed.
  :middleware
- [amperity.logging.ken/middleware]
+ [amperity.logging.core/ken-context
+  amperity.logging.core/extra-format]
 
  ;; Outputs to send log messages to, specified by a keyword and a configuration
  ;; value. There are various ways to configure the outputs; see the

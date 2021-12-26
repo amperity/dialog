@@ -7,5 +7,7 @@
   [output]
   (fn write-event
     [event payload]
+    (prn event)
+    (println payload)
     ;; TODO: implement
     ,,,))

@@ -29,4 +29,5 @@
    {:source-paths ["dev"]
     :repl-options {:init-ns dialog.repl}
     :dependencies [[org.clojure/tools.namespace "1.2.0"]]
-    :jvm-opts ["-XX:-OmitStackTraceInFastThrow"]}})
+    :jvm-opts ["-XX:-OmitStackTraceInFastThrow"
+               "-Ddialog.profile=repl"]}})
