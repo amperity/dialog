@@ -182,8 +182,8 @@
   "Read logging configuration from an EDN resource (if available) and set any
   runtime overrides from JVM properties an the process environment."
   []
-  (let [profile-key (keyword (some-setting "DIALOG_CONFIG_PROFILE"
-                                           "dialog.config.profile"
+  (let [profile-key (keyword (some-setting "DIALOG_PROFILE"
+                                           "dialog.profile"
                                            :default))
         base-config (if-let [config-edn (io/resource "dialog/config.edn")]
                       (try
