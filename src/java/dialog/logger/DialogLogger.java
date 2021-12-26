@@ -2,6 +2,9 @@ package dialog.logger;
 
 import clojure.lang.IFn;
 import clojure.lang.Keyword;
+import clojure.lang.RT;
+import clojure.lang.Symbol;
+
 import org.slf4j.Logger;
 import org.slf4j.Marker;
 
@@ -66,7 +69,14 @@ public final class DialogLogger implements Logger {
      * @return true if the logger should send messages at this level
      */
     private boolean isEnabled(Keyword level) {
-        return (Boolean)isEnabledFn.invoke(name, level);
+        IFn f = isEnabledFn;
+
+        // DEBUG: uncomment this for development only so that code reloading works
+        IFn resolve = RT.var("clojure.core", "requiring-resolve");
+        Symbol isEnabledName = Symbol.intern("dialog.logger", "enabled?");
+        f = (IFn)resolve.invoke(isEnabledName);
+
+        return (Boolean)f.invoke(name, level);
     }
 
 
@@ -78,7 +88,15 @@ public final class DialogLogger implements Logger {
      * @param err    throwable exception associated with the message
      */
     private void logMessage(Keyword level, String msg, Throwable err) {
-        logMessageFn.invoke(level, msg, err);
+        IFn f = logMessageFn;
+
+        // DEBUG: uncomment this for development only so that code reloading works
+        // TODO: add a CI check for this
+        IFn resolve = RT.var("clojure.core", "requiring-resolve");
+        Symbol isEnabledName = Symbol.intern("dialog.logger", "log-message");
+        f = (IFn)resolve.invoke(isEnabledName);
+
+        f.invoke(level, msg, err);
     }
 
 
