@@ -27,6 +27,8 @@
  :sys "app"
  ;; (optional) Thread this event was generated in.
  :thread "main"
+ ;; (optional) Duration in milliseconds for this event
+ :duration 0.123
  ;; (optional) Throwable error associated with this event.
  :error (ex-info "..." {,,,})
  ;; (optional) Any other fields
