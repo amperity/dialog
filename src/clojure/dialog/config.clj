@@ -16,7 +16,7 @@
   "Print a message to stderr when something goes wrong during initialization."
   [message & args]
   (binding [*out* *err*]
-    (apply printf (str message \newline) args)
+    (apply printf (str "[dialog config error] " message \newline) args)
     (flush))
   nil)
 

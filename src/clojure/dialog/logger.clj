@@ -1,7 +1,8 @@
 (ns dialog.logger
   "Logging implementation logic and integration with SLF4J."
   (:require
-    [dialog.config :as config]))
+    [dialog.config :as config]
+    [dialog.logger.util :as u]))
 
 
 (def config
@@ -27,16 +28,19 @@
 (defn- apply-middleware
   "Apply a sequence of middleware functions to an event."
   [event middleware]
-  (try
-    (reduce
-      (fn [event f]
-        (when event
-          (f config event)))
-      event
-      middleware)
-    (catch Exception ex
-      ;; TODO: throttled error output
-      nil)))
+  (reduce
+    (fn [event f]
+      (when event
+        (try
+          (f config event)
+          (catch Exception ex
+            (u/print-err :middleware
+                         "Failed to apply middleware function %s: %s"
+                         (.getName (class f))
+                         (ex-message ex))
+            event))))
+    event
+    middleware))
 
 
 (defn log-event
@@ -52,9 +56,11 @@
             (when write-event
               (let [payload (format-event event)]
                 (write-event event payload))))
-          (catch Exception _
-            ;; TODO: throttled error output
-            nil)))
+          (catch Exception ex
+            (u/print-err :output
+                         "Failed to write to output %s: %s"
+                         (name id)
+                         (ex-message ex)))))
       (:outputs config))))
 
 
