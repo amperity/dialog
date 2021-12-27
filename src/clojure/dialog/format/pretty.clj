@@ -7,7 +7,6 @@
     [io.aviso.exception :as ex])
   (:import
     (java.time
-      Instant
       LocalDateTime
       ZoneId)
     (java.time.format

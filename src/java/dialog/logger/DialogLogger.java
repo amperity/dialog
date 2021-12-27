@@ -93,8 +93,8 @@ public final class DialogLogger implements Logger {
         // DEBUG: uncomment this for development only so that code reloading works
         // TODO: add a CI check for this
         IFn resolve = RT.var("clojure.core", "requiring-resolve");
-        Symbol isEnabledName = Symbol.intern("dialog.logger", "log-message");
-        f = (IFn)resolve.invoke(isEnabledName);
+        Symbol logMessageName = Symbol.intern("dialog.logger", "log-message");
+        f = (IFn)resolve.invoke(logMessageName);
 
         f.invoke(name, level, msg, err);
     }

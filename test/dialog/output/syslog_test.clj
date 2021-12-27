@@ -1,6 +1,6 @@
 (ns dialog.output.syslog-test
   (:require
-    [clojure.test :as test :refer [deftest testing is]]
+    [clojure.test :as test :refer [deftest is]]
     [dialog.output.syslog :as syslog]))
 
 

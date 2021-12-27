@@ -33,7 +33,7 @@
 
 (defn formatter
   "Construct a JSON event formatting function."
-  [output]
+  [_output]
   (fn format-event
     [event]
     (json/write-str

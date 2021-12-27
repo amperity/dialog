@@ -12,7 +12,6 @@
       DatagramPacket
       DatagramSocket
       InetAddress
-      Socket
       SocketException
       UnknownHostException)
     java.time.Instant))
@@ -146,14 +145,12 @@
   successfully delivered, false if not."
   [conn event message]
   (let [{:keys [socket address port]} conn
-        {:keys [level timestamp_ hostname_ context output-fn]} event
-        ;; TODO: un-timbre this
         payload (encode-payload
-                  @timestamp_
-                  @hostname_
-                  (:sys context)
-                  (:host context)
-                  level
+                  (str (:time event))
+                  (:host event)
+                  (:sys event)
+                  (:proc event)
+                  (:level event)
                   message)
         packet (DatagramPacket.
                  payload
