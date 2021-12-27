@@ -1,6 +1,7 @@
 (ns dialog.logger
   "Logging implementation logic and integration with SLF4J."
   (:require
+    [clojure.string :as str]
     [dialog.config :as config]
     [dialog.logger.util :as u])
   (:import
@@ -22,11 +23,132 @@
     nil))
 
 
+;; ## Logger Levels
+
+(def ^:private level-cache
+  "Stateful cache of computed levels for specific loggers."
+  (atom {} :validator map?))
+
+
+(defn valid-level?
+  "True if the provided value is a valid logger level keyword."
+  [x]
+  (contains? #{:trace :debug :info :warn :error} x))
+
+
+(defn level-above?
+  "True if the level keyword is equal to or greater in severity than the
+  threshold."
+  [threshold level]
+  (case threshold
+    :trace
+    true
+
+    :debug
+    (case level
+      :trace false
+      true)
+
+    :info
+    (case level
+      (:trace :debug) false
+      true)
+
+    :warn
+    (case level
+      (:warn :error) true
+      false)
+
+    :error
+    (identical? :error level)
+
+    :off
+    false))
+
+
+(defn- prefixed?
+  "True if `logger-name` is equal to or prefixed by `prefix`. Here 'prefixing'
+  means adding a period to the end of `prefix` to ensure the logger is a
+  descendant and not merely a similarly-named logger.
+
+  For example, if we're given the prefix `\"foo.bar\"` then the following
+  logger-names evaluate to:
+
+      \"foo.bar\" => true
+      \"foo.bar.baz\" => true
+      \"foo.bartle\" => false
+  "
+  [logger prefix]
+  (or (= logger prefix)
+      (str/starts-with? logger (str prefix \.))))
+
+
+(defn- match-block
+  "Return `:off` if there is a blocking prefix matching this logger."
+  [logger]
+  (when (first (filter #(prefixed? logger %) (:blocked config)))
+    :off))
+
+
+(defn- match-level
+  "Get the value for the key which is the deepest prefix of the given logger
+  name, or nil if no keys prefix the logger."
+  [logger]
+  (when-let [match (->> (:levels config)
+                        (sort-by (comp count key) (comp - compare))
+                        (filter #(prefixed? logger (key %)))
+                        (first))]
+    (val match)))
+
+
+(defn get-levels
+  "Return a map of all configured logger names to level keywords."
+  []
+  (:levels config))
+
+
+(defn get-level
+  "Get the current level setting for a logger. If no logger name is provided,
+  this returns the root logger's level."
+  ([]
+   (or (:level config) :info))
+  ([logger]
+   (or (get @level-cache logger)
+       (let [level (or (match-block logger)
+                       (match-level logger)
+                       (get-level))]
+         (swap! level-cache assoc logger level)
+         level))))
+
+
+(defn set-level!
+  "Dynamically adjust the level for the named logger. If no name is provided,
+  adjusts the level of the root logger. Returns nil."
+  ([level]
+   {:pre [(valid-level? level)]}
+   (alter-var-root #'config assoc :level level)
+   (swap! level-cache empty)
+   nil)
+  ([logger level]
+   {:pre [(string? logger) (valid-level? level)]}
+   (alter-var-root #'config assoc-in [:levels logger] level)
+   (swap! level-cache empty)
+   nil))
+
+
+(defn clear-levels!
+  "Dynamically adjust the configuration to remove all logger levels. Does not
+  change the root level. Returns nil."
+  []
+  (alter-var-root #'config assoc :levels {})
+  (swap! level-cache empty)
+  nil)
+
+
 (defn enabled?
   "True if the given logger is enabled at the provided level."
   [logger level]
-  ;; TODO: implement
-  true)
+  (level-above? (get-level logger) level))
 
 
 ;; ## Event Logging
