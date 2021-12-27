@@ -223,3 +223,133 @@
               :logger logger
               :message msg
               :error err}))
+
+
+;; ## Logging APIs
+
+(defmacro logp
+  "Log a message using print style args. Can optionally take a throwable as its
+  second arg."
+  {:arglists '([level message & more] [level throwable message & more])}
+  [level x & more]
+  (let [logger (str (ns-name *ns*))
+        line (:line (meta &form))]
+    (if (or (string? x) (nil? more))
+      `(when (enabled? ~logger ~level)
+         (log-event {:level ~level
+                     :logger ~logger
+                     :line ~line
+                     :message (print-str ~x ~@more)}))
+      `(let [logger# ~logger]
+         (when (enabled? logger# ~level)
+           (let [x# ~x
+                 more# (print-str ~@more)]
+             (if (instance? Throwable x#)
+               (log-event {:level ~level
+                           :logger logger#
+                           :line ~line
+                           :message more#
+                           :error x#})
+               (log-event {:level ~level
+                           :logger logger#
+                           :line ~line
+                           :message (str (print-str x#) " " more#)}))))))))
+
+
+(defmacro logf
+  "Log a message using a format string and args. Can optionally take a
+  throwable as its second arg."
+  {:arglists '([level fmt & fmt-args] [level throwable fmt & fmt-args])}
+  [level x & more]
+  (let [logger (str (ns-name *ns*))
+        line (:line (meta &form))]
+    (if (or (string? x) (nil? more))
+      `(when (enabled? ~logger ~level)
+         (log-event {:level ~level
+                     :logger ~logger
+                     :line ~line
+                     :message (format ~x ~@more)}))
+      `(let [logger# ~logger]
+         (when (enabled? logger# ~level)
+           (let [x# ~x]
+             (if (instance? Throwable x#)
+               (log-event {:level ~level
+                           :logger logger#
+                           :line ~line
+                           :message (format ~@more)
+                           :error x#})
+               (log-event {:level ~level
+                           :logger logger#
+                           :line ~line
+                           :message (format x# ~@more)}))))))))
+
+
+(defmacro trace
+  "Trace level logging using print-style args.
+  Use the 'logging.readable' namespace to avoid wrapping args in pr-str."
+  {:arglists '([message & more] [throwable message & more])}
+  [& args]
+  `(logp :trace ~@args))
+
+
+(defmacro tracef
+  "Trace level logging using format."
+  {:arglists '([fmt & fmt-args] [throwable fmt & fmt-args])}
+  [& args]
+  `(logf :trace ~@args))
+
+
+(defmacro debug
+  "Debug level logging using print-style args."
+  {:arglists '([message & more] [throwable message & more])}
+  [& args]
+  `(logp :debug ~@args))
+
+
+(defmacro debugf
+  "Debug level logging using format."
+  {:arglists '([fmt & fmt-args] [throwable fmt & fmt-args])}
+  [& args]
+  `(logf :debug ~@args))
+
+
+(defmacro info
+  "Info level logging using print-style args."
+  {:arglists '([message & more] [throwable message & more])}
+  [& args]
+  `(logp :info ~@args))
+
+
+(defmacro infof
+  "Info level logging using format."
+  {:arglists '([fmt & fmt-args] [throwable fmt & fmt-args])}
+  [& args]
+  `(logf :info ~@args))
+
+
+(defmacro warn
+  "Warn level logging using print-style args."
+  {:arglists '([message & more] [throwable message & more])}
+  [& args]
+  `(logp :warn ~@args))
+
+
+(defmacro warnf
+  "Warn level logging using format."
+  {:arglists '([fmt & fmt-args] [throwable fmt & fmt-args])}
+  [& args]
+  `(logf :warn ~@args))
+
+
+(defmacro error
+  "Error level logging using print-style args."
+  {:arglists '([message & more] [throwable message & more])}
+  [& args]
+  `(logp :error ~@args))
+
+
+(defmacro errorf
+  "Error level logging using format."
+  {:arglists '([fmt & fmt-args] [throwable fmt & fmt-args])}
+  [& args]
+  `(logf :error ~@args))
