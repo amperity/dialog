@@ -40,6 +40,17 @@ jobs:
           name: Lint source code
           command: "./clj-kondo --lint src test"
 
+  misc:
+    executor: clojure
+    steps:
+      - checkout
+      - run:
+          name: "Check declared SLF4J version"
+          command: ./test/check-api-version.sh
+      - run:
+          name: "Check for dynamic resolution"
+          command: ./test/check-dynamic-resolves.sh
+
   test:
     executor: clojure
     steps:

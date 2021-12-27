@@ -22,10 +22,9 @@ public final class StaticLoggerBinder {
     /**
      * Declare the version of the SLF4J API this implementation is compiled against.
      *
-     * This should be kept in sync with the version declared in project.clj
-     * TODO: add a CI test checking this invariant.
+     * This should be kept in sync with the version declared in `project.clj`.
      */
-    public static final String REQUESTED_API_VERSION = "1.7.30";
+    public static final String REQUESTED_API_VERSION = "1.7.32";
 
 
     /**
