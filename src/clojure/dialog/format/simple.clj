@@ -42,7 +42,7 @@
       (rpad (format-level (:level event)) 5)
       " "
       ;; Logger
-      (rpad (:logger event) 30)
+      (rpad (str (:logger event)) 30)
       "  "
       ;; Message
       (or (:message event) "-")
