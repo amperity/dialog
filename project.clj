@@ -4,6 +4,9 @@
   :license {:name "MIT License"
             :url "https://mit-license.org/"}
 
+  :plugins
+  [[lein-cloverage "1.2.2"]]
+
   :dependencies
   [[org.clojure/clojure "1.10.3"]
    [org.clojure/data.json "2.4.0"]
