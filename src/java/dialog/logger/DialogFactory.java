@@ -17,13 +17,13 @@ public final class DialogFactory implements ILoggerFactory {
 
 
     /**
-     * Log level enabled check.
+     * Log level lookup function.
      */
-    private final IFn isEnabledFn;
+    private final IFn getLevelFn;
 
 
     /**
-     * Log event entry.
+     * Log event entry function.
      */
     private final IFn logMessageFn;
 
@@ -31,12 +31,12 @@ public final class DialogFactory implements ILoggerFactory {
     /**
      * Construct a new logger factory.
      *
-     * @param isEnabledFn   function to check whether the logger is enabled
+     * @param getLevelFn    function to get the level for a logger
      * @param logMessageFn  function to log an event
      */
-    public DialogFactory(IFn isEnabledFn, IFn logMessageFn) {
-        this.cache = new ConcurrentHashMap(64);
-        this.isEnabledFn = isEnabledFn;
+    public DialogFactory(IFn getLevelFn, IFn logMessageFn) {
+        this.cache = new ConcurrentHashMap<>(64);
+        this.getLevelFn = getLevelFn;
         this.logMessageFn = logMessageFn;
     }
 
@@ -54,7 +54,7 @@ public final class DialogFactory implements ILoggerFactory {
         // loggers statically, so this is unlikely to actually produce
         // duplicates. Even if it does, usage is still safe and the cost is
         // minimal.
-        DialogLogger logger = new DialogLogger(name, isEnabledFn, logMessageFn);
+        DialogLogger logger = new DialogLogger(name, getLevelFn, logMessageFn);
         cache.put(name, logger);
 
         return logger;

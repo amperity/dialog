@@ -15,6 +15,7 @@
 
   :source-paths ["src/clojure"]
   :java-source-paths ["src/java"]
+  :javac-options ["-Xlint:unchecked"]
 
   :hiera
   {:cluster-depth 2

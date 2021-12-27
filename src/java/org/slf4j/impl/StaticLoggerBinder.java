@@ -59,16 +59,16 @@ public final class StaticLoggerBinder {
             IFn initConfig = (IFn)resolve.invoke(initConfigName);
             initConfig.invoke();
 
-            // Resolve enabled fn.
-            Symbol isEnabledName = Symbol.intern("dialog.logger", "enabled?");
-            IFn isEnabled = (IFn)resolve.invoke(isEnabledName);
+            // Resolve level fn.
+            Symbol getLevelName = Symbol.intern("dialog.logger", "get-level");
+            IFn getLevel = (IFn)resolve.invoke(getLevelName);
 
-            // Resolve log event fn.
+            // Resolve logging fn.
             Symbol logMessageName = Symbol.intern("dialog.logger", "log-message");
             IFn logMessage = (IFn)resolve.invoke(logMessageName);
 
             // Construct singleton
-            DialogFactory factory = new DialogFactory(isEnabled, logMessage);
+            DialogFactory factory = new DialogFactory(getLevel, logMessage);
             instance = new StaticLoggerBinder(factory);
 
             // Configure JUL bridge

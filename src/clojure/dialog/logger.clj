@@ -5,6 +5,9 @@
     [dialog.config :as config]
     [dialog.logger.util :as u])
   (:import
+    (dialog.logger
+      DialogLogger
+      Level)
     java.time.Instant))
 
 
@@ -30,40 +33,13 @@
   (atom {} :validator map?))
 
 
-(defn valid-level?
-  "True if the provided value is a valid logger level keyword."
-  [x]
-  (contains? #{:trace :debug :info :warn :error} x))
-
-
-(defn level-above?
-  "True if the level keyword is equal to or greater in severity than the
-  threshold."
-  [threshold level]
-  (case threshold
-    :trace
-    true
-
-    :debug
-    (case level
-      :trace false
-      true)
-
-    :info
-    (case level
-      (:trace :debug) false
-      true)
-
-    :warn
-    (case level
-      (:warn :error) true
-      false)
-
-    :error
-    (identical? :error level)
-
-    :off
-    false))
+(defn- reset-level-cache!
+  "Reset the cache of logger levels and increment the Java cache version so
+  loggers re-check."
+  []
+  (swap! level-cache empty)
+  (DialogLogger/bumpCache)
+  nil)
 
 
 (defn- prefixed?
@@ -101,6 +77,12 @@
     (val match)))
 
 
+(defn valid-level?
+  "True if the provided value is a valid logger level keyword."
+  [x]
+  (contains? #{:trace :debug :info :warn :error :off} x))
+
+
 (defn get-levels
   "Return a map of all configured logger names to level keywords."
   []
@@ -127,13 +109,11 @@
   ([level]
    {:pre [(valid-level? level)]}
    (alter-var-root #'config assoc :level level)
-   (swap! level-cache empty)
-   nil)
+   (reset-level-cache!))
   ([logger level]
    {:pre [(string? logger) (valid-level? level)]}
    (alter-var-root #'config assoc-in [:levels logger] level)
-   (swap! level-cache empty)
-   nil))
+   (reset-level-cache!)))
 
 
 (defn clear-levels!
@@ -141,14 +121,15 @@
   change the root level. Returns nil."
   []
   (alter-var-root #'config assoc :levels {})
-  (swap! level-cache empty)
-  nil)
+  (reset-level-cache!))
 
 
 (defn enabled?
   "True if the given logger is enabled at the provided level."
   [logger level]
-  (level-above? (get-level logger) level))
+  (Level/isAllowed
+    (Level/ofKeyword (get-level logger))
+    (Level/ofKeyword level)))
 
 
 ;; ## Event Logging

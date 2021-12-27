@@ -7,7 +7,12 @@
     [clojure.tools.namespace.repl :refer [refresh]]
     [dialog.config :as config]
     [dialog.logger :as log]
-    [dialog.logger.util :as u]))
+    [dialog.logger.util :as u])
+  (:import
+    (dialog.logger
+      DialogFactory
+      DialogLogger
+      Level)))
 
 
 (defn init!
