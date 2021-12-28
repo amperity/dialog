@@ -185,7 +185,7 @@
 (defn valid-level?
   "True if the provided value is a valid logger level keyword."
   [x]
-  (contains? #{:trace :debug :info :warn :error :off} x))
+  (contains? #{:trace :debug :info :warn :error :fatal :off} x))
 
 
 (defn get-levels
@@ -439,3 +439,17 @@
   {:arglists '([fmt & fmt-args] [throwable fmt & fmt-args])}
   [& args]
   `(logf :error ~@args))
+
+
+(defmacro fatal
+  "Fatal level logging using print-style args."
+  {:arglists '([message & more] [throwable message & more])}
+  [& args]
+  `(logp :fatal ~@args))
+
+
+(defmacro fatalf
+  "Fatal level logging using format."
+  {:arglists '([fmt & fmt-args] [throwable fmt & fmt-args])}
+  [& args]
+  `(logf :fatal ~@args))

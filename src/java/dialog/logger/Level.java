@@ -9,7 +9,7 @@ import clojure.lang.Keyword;
 public enum Level {
 
     // Level member constants
-    TRACE, DEBUG, INFO, WARN, ERROR, OFF;
+    TRACE, DEBUG, INFO, WARN, ERROR, FATAL, OFF;
 
 
     /** Clojure keyword corresponding to this level. */
