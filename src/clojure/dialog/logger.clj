@@ -107,8 +107,8 @@
 
 (defn valid-level?
   "True if the provided value is a valid logger level keyword."
-  [x]
-  (contains? #{:trace :debug :info :warn :error :fatal :off} x))
+  [k]
+  (Level/isValid k))
 
 
 (defn get-levels

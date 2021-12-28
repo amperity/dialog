@@ -28,6 +28,7 @@ public enum Level {
      * Find a level value matching the given keyword.
      *
      * @param k  level keyword to match.
+     * @return the matching level, if any
      */
     public static Level ofKeyword(Keyword k) {
         for (Level level : Level.values()) {
@@ -36,6 +37,22 @@ public enum Level {
             }
         }
         throw new IllegalArgumentException("Not a valid level keyword: " + k);
+    }
+
+
+    /**
+     * Determine whether the given keyword is a valid level.
+     *
+     * @param k  level keyword to check
+     * @return true if the keyword is valid, otherwise false
+     */
+    public static boolean isValid(Keyword k) {
+        for (Level level : Level.values()) {
+            if (level.keyword.equals(k)) {
+                return true;
+            }
+        }
+        return false;
     }
 
 
