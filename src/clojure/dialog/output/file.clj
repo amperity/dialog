@@ -11,7 +11,10 @@
 (defn writer
   "Construct a file event writer function."
   [output]
-  {:pre [(string? (:path output))]}
+  (when-not (string? (:path output))
+    (throw (IllegalArgumentException.
+             (str "File output writer requires a string :path, got: "
+                  (pr-str (:path output))))))
   (let [path (:path output)
         lock (Object.)]
     (io/make-parents path)
