@@ -80,14 +80,14 @@
                     assoc
                     :dialog.format/tail "<CUSTOM TAIL>")))))
     (testing "with extra info"
-      (is (= "2021-12-27T15:33:18Z [main]                   WARN  foo.bar.baz                     Another thing  {:foo.alpha 123}"
+      (is (= "2021-12-27T15:33:18Z [main]                   WARN  foo.bar.baz                     Another thing"
              (fmt {:time inst
                    :level :warn
                    :logger "foo.bar.baz"
                    :message "Another thing"
                    :thread "main"
                    :foo.alpha 123}))
-          "default extra info shows")
+          "default extra info is ignored")
       (is (= "2021-12-27T15:33:18Z [main]                   WARN  foo.bar.baz                     Another thing  {:bar :xyz}"
              (fmt (vary-meta
                     {:time inst

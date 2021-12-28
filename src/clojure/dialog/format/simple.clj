@@ -53,10 +53,7 @@
       (when-let [tail (:dialog.format/tail (meta event))]
         (str " " tail))
       ;; Extra Data
-      (when-let [extra (-> (:dialog.format/extra (meta event) event)
-                           (dissoc :time :level :logger :line :message
-                                   :duration :host :proc :sys :thread :error)
-                           (not-empty))]
+      (when-let [extra (:dialog.format/extra (meta event))]
         (str "  " (pr-str extra)))
       ;; Exceptions
       (when-let [ex (:error event)]
