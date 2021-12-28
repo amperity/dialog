@@ -141,7 +141,7 @@
                  (pr-str output))
 
       ;; Check that output type is understood.
-      (not (contains? #{:null :print :file :syslog}
+      (not (contains? #{:null :file :print :syslog}
                       (:type output)))
       (print-err "output %s has invalid type: %s"
                  id
@@ -156,17 +156,24 @@
 
       ;; Initialize format and output functions.
       :else
-      [id (assoc output
-                 :formatter (case (:format output)
-                              :message :message
-                              :simple  (fmt.simple/formatter output)
-                              :pretty  (fmt.pretty/formatter output)
-                              :json    (fmt.json/formatter output))
-                 :writer (case (:type output)
-                           :null   nil
-                           :file   (out.file/writer output)
-                           :print  (out.print/writer output)
-                           :syslog (out.syslog/writer output)))])))
+      (try
+        (let [formatter (case (:format output)
+                          :message :message
+                          :simple  (fmt.simple/formatter output)
+                          :pretty  (fmt.pretty/formatter output)
+                          :json    (fmt.json/formatter output))
+              writer (case (:type output)
+                       :null   nil
+                       :file   (out.file/writer output)
+                       :print  (out.print/writer output)
+                       :syslog (out.syslog/writer output))]
+          [id (assoc output
+                     :formatter formatter
+                     :writer writer)])
+        (catch Exception ex
+          (print-err "output %s failed to initialize: %s %s"
+                     (.getName (class ex))
+                     (ex-message ex)))))))
 
 
 (defn- initialize-outputs

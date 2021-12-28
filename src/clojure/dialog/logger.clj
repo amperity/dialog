@@ -1,7 +1,6 @@
 (ns dialog.logger
   "Logging implementation logic and integration with SLF4J."
   (:require
-    [clojure.java.shell :as sh]
     [clojure.string :as str]
     [dialog.config :as config]
     [dialog.util :as u])
@@ -9,7 +8,6 @@
     (dialog.logger
       DialogLogger
       Level)
-    java.net.InetAddress
     java.time.Instant))
 
 
