@@ -6,8 +6,7 @@
     [clojure.tools.logging :as ctl]
     [clojure.tools.namespace.repl :refer [refresh]]
     [dialog.config :as config]
-    [dialog.logger :as log]
-    [dialog.logger.util :as u])
+    [dialog.logger :as log])
   (:import
     (dialog.logger
       DialogFactory

@@ -6,7 +6,7 @@
 {;; Initialization function which is resolved and called at startup time with
  ;; the configuration map. Should return an updated config map, and may perform
  ;; any desired side-effects.
- :init amperity.logging.core/initialize!
+ :init acme.logging/initialize!
 
  ;; Root logger level. Can be overridden at runtime with the JVM property
  ;; `dialog.level` or the environment variable `DIALOG_LEVEL`.
@@ -35,14 +35,14 @@
  ;; by returning nil. Functions are called with the current configuration map
  ;; and the event being processed.
  :middleware
- [amperity.logging.core/ken-context
-  amperity.logging.core/extra-format]
+ [acme.logging/ken-context
+  acme.logging/extra-format]
 
  ;; Outputs to send log messages to, specified by a keyword and a configuration
  ;; value. There are various ways to configure the outputs; see the
  ;; documentation for more information on the various options.
  :outputs
- #profile {:test {}
+ #profile {:test {:shh :null}
            :repl {:console {:type :print
                             :format :pretty
                             :timestamp :short}}
