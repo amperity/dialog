@@ -140,7 +140,7 @@
     (let [writes (atom [])]
       (is (nil? (#'log/write-output!
                  :test
-                 {:writer (fn [event message] (swap! writes conj message))}
+                 {:writer (fn [_ message] (swap! writes conj message))}
                  {:logger "foo.bar"
                   :level :info
                   :message "hello"})))
@@ -149,7 +149,7 @@
     (let [writes (atom [])]
       (is (nil? (#'log/write-output!
                  :test
-                 {:writer (fn [event message] (swap! writes conj message))
+                 {:writer (fn [_ message] (swap! writes conj message))
                   :formatter (fn [event] (str "**" (:message event) "!**"))}
                  {:logger "foo.bar"
                   :level :info
@@ -162,7 +162,7 @@
   (testing "log-event"
     (let [logged (atom [])]
       (with-redefs [log/config (assoc log/config :outputs {:test {:type :null}})
-                    log/write-output! (fn [id output event]
+                    log/write-output! (fn [id _ event]
                                         (swap! logged conj [id (:level event) (:logger event)]))]
         (testing "with bad properties"
           (is (nil? (log/log-event {:logger 123
