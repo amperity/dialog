@@ -1,19 +1,15 @@
 (ns dialog.output.syslog
   "Log appender implementation for syslog via UDP."
   (:require
-    [clojure.stacktrace :as stacktrace]
     [clojure.string :as str])
   (:import
     (java.io
       ByteArrayOutputStream
-      IOException
       OutputStream)
     (java.net
       DatagramPacket
       DatagramSocket
-      InetAddress
-      SocketException
-      UnknownHostException)
+      InetAddress)
     java.time.Instant))
 
 
@@ -90,7 +86,7 @@
       ;; VERSION
       (write-char \1)
       ;; TIMESTAMP
-      (write-field (or timestamp (str (Instant/now))))
+      (write-field (str (or timestamp (Instant/now))))
       ;; HOSTNAME
       (write-field host)
       ;; APP-NAME
@@ -115,38 +111,22 @@
 
 (defn- connect!
   "Open a connection to the local syslog daemon. Returns a map containing an
-  open socket and address/port information on success, or nil on failure."
+  open socket and address/port information on success, or throws an exception
+  on failure."
   [address port]
-  (try
-    {:socket (DatagramSocket.)
-     :address (if address
-                (InetAddress/getByName address)
-                (InetAddress/getLocalHost))
-     :port (or port 514)}
-    (catch UnknownHostException ex
-      (binding [*out* *err*]
-        (println "Unable to resolve localhost for syslog")
-        (stacktrace/print-throwable ex)
-        nil))
-    (catch SocketException ex
-      (binding [*out* *err*]
-        (println "Error connecting to syslog UDP socket")
-        (stacktrace/print-throwable ex)
-        nil))
-    (catch Exception ex
-      (binding [*out* *err*]
-        (println "Error initializing syslog connection")
-        (stacktrace/print-cause-trace ex)
-        nil))))
+  {:socket (DatagramSocket.)
+   :address (if address
+              (InetAddress/getByName address)
+              (InetAddress/getLocalHost))
+   :port (or port 514)})
 
 
 (defn- write-packet!
-  "Write a log event to the syslog socket. Returns true if the message was
-  successfully delivered, false if not."
+  "Write a log event to the syslog socket."
   [conn event message]
   (let [{:keys [socket address port]} conn
         payload (encode-payload
-                  (str (:time event))
+                  (:time event)
                   (:host event)
                   (:sys event)
                   (:proc event)
@@ -157,14 +137,8 @@
                  (count payload)
                  ^InetAddress address
                  (int port))]
-    (try
-      (.send ^DatagramSocket socket packet)
-      true
-      (catch IOException ex
-        (binding [*out* *err*]
-          (println "Error sending syslog packet")
-          (stacktrace/print-throwable ex))
-        false))))
+    (.send ^DatagramSocket socket packet)
+    nil))
 
 
 (defn writer
