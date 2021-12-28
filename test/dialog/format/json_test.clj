@@ -16,8 +16,10 @@
       (is (= "{\"time\":\"2021-12-27T15:17:31Z\"}"
              (fmt {:time (Instant/parse "2021-12-27T15:17:31Z")}))
           "instants format as strings"))
+    (testing "namespaced keys"
+      (is (= "{\"foo.bar/baz?\":true}"
+             (fmt {:foo.bar/baz? true}))))
     (testing "throwables"
       (let [ex (RuntimeException. "BOOM")
             message (fmt {:error ex})]
-        (is (str/starts-with? message "{\"error\":[{\"class-name\":\"java.lang.RuntimeException\","))
-        ,,,))))
+        (is (str/starts-with? message "{\"error\":[{\"class-name\":\"java.lang.RuntimeException\","))))))

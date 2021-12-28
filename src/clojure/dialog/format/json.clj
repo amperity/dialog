@@ -5,6 +5,13 @@
     [io.aviso.exception :as ex]))
 
 
+(defn- kw->str
+  "Coerce a keyword into a string, preserving its namespace."
+  [k]
+  (when k
+    (subs (str k) 1)))
+
+
 (defn- sanitize-stack-frame
   "Sanitize a map of stack frame data for JSON serialization."
   [frame]
@@ -39,4 +46,6 @@
     (json/write-str
       (cond-> event
         (:error event)
-        (update :error render-exception)))))
+        (update :error render-exception))
+      :key-fn kw->str
+      :escape-slash false)))
