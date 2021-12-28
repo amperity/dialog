@@ -9,7 +9,9 @@
     [dialog.format.simple :as fmt.simple]
     [dialog.output.file :as out.file]
     [dialog.output.print :as out.print]
-    [dialog.output.syslog :as out.syslog]))
+    [dialog.output.syslog :as out.syslog])
+  (:import
+    dialog.logger.Level))
 
 
 (defn- print-err
@@ -30,30 +32,50 @@
       default))
 
 
-(defn- collect-levels
-  "Look in the JVM system properties and process environment for logger level
-  configs. Returns a map of collected level settings."
+(defn- collect-prop-levels
+  "Look in the JVM system properties for logger level configs. Returns a map of
+  collected level settings."
   ([]
-   (collect-levels (System/getenv) (System/getProperties)))
-  ([env properties]
-   (merge
-     (let [prefix "dialog.level."]
-       (into {}
-             (comp
-               (filter #(str/starts-with? (key %) prefix))
-               (map (juxt #(subs (key %) (count prefix))
-                          (comp keyword str/lower-case val))))
-             properties))
-     (let [prefix "DIALOG_LEVEL_"]
-       (into {}
-             (comp
-               (filter #(str/starts-with? (key %) prefix))
-               (map (juxt #(-> (key %)
-                               (subs (count prefix))
-                               (str/lower-case)
-                               (str/replace "_" "."))
-                          (comp keyword str/lower-case val))))
-             env)))))
+   (collect-prop-levels (System/getProperties)))
+  ([properties]
+   (let [prefix "dialog.level."]
+     (into {}
+           (comp
+             (filter #(str/starts-with? (key %) prefix))
+             (remove #(= prefix (key %)))
+             (keep (fn [[prop level-str]]
+                     (let [level (keyword (str/lower-case level-str))]
+                       (if (Level/isValid level)
+                         [(subs prop (count prefix)) level]
+                         (print-err "JVM property %s specifies invalid level %s"
+                                    prop
+                                    level-str))))))
+           properties))))
+
+
+(defn- collect-env-levels
+  "Look in the process environment for logger level configs. Returns a map of
+  collected level settings."
+  ([]
+   (collect-env-levels (System/getenv)))
+  ([env]
+   (let [prefix "DIALOG_LEVEL_"]
+     (into {}
+           (comp
+             (filter #(str/starts-with? (key %) prefix))
+             (remove #(= prefix (key %)))
+             (keep (fn [[var-name level-str]]
+                     (let [level (keyword (str/lower-case level-str))]
+                       (if (Level/isValid level)
+                         [(-> var-name
+                              (subs (count prefix))
+                              (str/lower-case)
+                              (str/replace "_" "."))
+                          level]
+                         (print-err "Environment variable %s specifies invalid level %s"
+                                    var-name
+                                    level-str))))))
+           env))))
 
 
 (defn- resolve-fn
@@ -62,10 +84,9 @@
   [kind x]
   (try
     (cond
-      (fn? x)
-      x
-
-      (var? x)
+      (or (nil? x)
+          (var? x)
+          (fn? x))
       x
 
       (symbol? x)
@@ -84,13 +105,12 @@
 (defn- resolve-middleware
   "Resolve any middleware symbols in the config to functions."
   [config]
-  (if-let [raw-mw (seq (:middleware config))]
-    (let [middleware (into []
-                           (keep (partial resolve-fn "middleware"))
-                           raw-mw)]
-      (if (seq middleware)
-        (assoc config :middleware middleware)
-        (dissoc config :middleware)))
+  (if-let [middleware (seq (:middleware config))]
+    (assoc config
+           :middleware
+           (into []
+                 (keep (partial resolve-fn "middleware"))
+                 middleware))
     config))
 
 
@@ -118,6 +138,26 @@
                    (ex-message ex))
         config))
     config))
+
+
+(defn- output-formatter
+  "Construct an output formatting function."
+  [output]
+  (case (:format output)
+    :message :message
+    :simple  (fmt.simple/formatter output)
+    :pretty  (fmt.pretty/formatter output)
+    :json    (fmt.json/formatter output)))
+
+
+(defn- output-writer
+  "Construct an output writing function."
+  [output]
+  (case (:type output)
+    :null   nil
+    :file   (out.file/writer output)
+    :print  (out.print/writer output)
+    :syslog (out.syslog/writer output)))
 
 
 (defn- initialize-output
@@ -148,8 +188,9 @@
                  (:type output))
 
       ;; Check that format type is understood.
-      (not (contains? #{:message :simple :pretty :json}
-                      (:format output)))
+      (and (contains? output :format)
+           (not (contains? #{:message :simple :pretty :json}
+                           (:format output))))
       (print-err "output %s has invalid format: %s"
                  id
                  (:format output))
@@ -157,21 +198,13 @@
       ;; Initialize format and output functions.
       :else
       (try
-        (let [formatter (case (:format output)
-                          :message :message
-                          :simple  (fmt.simple/formatter output)
-                          :pretty  (fmt.pretty/formatter output)
-                          :json    (fmt.json/formatter output))
-              writer (case (:type output)
-                       :null   nil
-                       :file   (out.file/writer output)
-                       :print  (out.print/writer output)
-                       :syslog (out.syslog/writer output))]
+        (let [output (merge {:format :simple} output)]
           [id (assoc output
-                     :formatter formatter
-                     :writer writer)])
+                     :formatter (output-formatter output)
+                     :writer (output-writer output))])
         (catch Exception ex
-          (print-err "output %s failed to initialize: %s %s"
+          (print-err "output %s could not be initialized: %s %s"
+                     id
                      (.getName (class ex))
                      (ex-message ex)))))))
 
@@ -185,33 +218,39 @@
         outputs))
 
 
+(defn- read-config
+  "Read the raw configuration from an EDN resource. Returns nil if the resource
+  is not found or can't be read."
+  [profile]
+  (when-let [config-edn (io/resource "dialog/config.edn")]
+    (try
+      (aero/read-config config-edn {:profile profile})
+      (catch Exception ex
+        (print-err "failed to read dialog config file: %s"
+                   (ex-message ex))))))
+
+
 (defn load-config
   "Read logging configuration from an EDN resource (if available) and set any
   runtime overrides from JVM properties an the process environment."
   []
-  (let [profile-key (keyword (some-setting "DIALOG_PROFILE"
-                                           "dialog.profile"
-                                           :default))
-        base-config (if-let [config-edn (io/resource "dialog/config.edn")]
-                      (try
-                        (aero/read-config config-edn {:profile profile-key})
-                        (catch Exception ex
-                          (print-err "failed to read dialog config file: %s"
-                                     (ex-message ex))
-                          {:level :info}))
-                      {:level :info})
+  (let [profile (keyword (some-setting "DIALOG_PROFILE"
+                                       "dialog.profile"
+                                       :default))
+        base-config (merge {:level :info
+                            :outputs {:console :print}}
+                           (read-config profile))
         root-level (some-setting "DIALOG_LEVEL"
                                  "dialog.level"
                                  nil)]
     (->
       base-config
-      (update :levels merge (collect-levels))
+      (update :levels merge
+              (collect-prop-levels)
+              (collect-env-levels))
       (cond->
         root-level
-        (assoc :level (keyword root-level))
-
-        (nil? (:outputs base-config))
-        (assoc :outputs {:console :print}))
+        (assoc :level (keyword root-level)))
       (resolve-init)
       (apply-init)
       (resolve-middleware)
