@@ -48,11 +48,11 @@ At initialization time (when SLF4J looks on the classpath for the
 `StaticLoggerBinder` class), dialog will try to read configuration from a
 resource named `dialog/config.edn`. This is an [aero](https://github.com/juxt/aero/)
 file which should contain a map telling dialog how to behave. The profile used
-to read the configuration should be set with the `dialog.profile` system
+to read the configuration can be set with the `dialog.profile` system
 property or `DIALOG_PROFILE` environment variable at runtime.
 
-Check out the [sample config](dev/dialog/config.edn) used with the REPL in this
-repo for a comprehensive example.
+Check out the [sample config](dev/dialog/config.edn) in this repo for a
+comprehensive example.
 
 ### Initialization Hook
 
@@ -64,8 +64,11 @@ function will be used as a modified version of the config.
 
 ### Logger Levels
 
-The thresholds for various loggers can be controlled with a few keys in the
-config map.
+Dialog supports the standard set of log levels, specified with keywords:
+`:trace`, `:debug`, `:info`, `:warn`, `:error`, and `:fatal` in ascending order
+of severity. Each logger may have a threshold and will only report events
+logged at that threshold or higher. These thresholds can be controlled with a
+few keys in the config map:
 
 - `:level`
 
@@ -86,10 +89,10 @@ config map.
 
   An optional set of logger prefixes which should **never** be logged. This can
   be useful as a security mechanism, to prevent output from loggers like
-  `org.apache.http.headers`, which includes can leak `Authorization: Bearer ...`
+  `org.apache.http.headers`, which can leak `Authorization: Bearer ...`
   secrets.
 
-### Logging Middleware
+### Middleware
 
 The `:middleware` entry in the config can contain a vector of "middleware
 functions", which will be called in order on incoming events to process them
@@ -103,7 +106,7 @@ function should return an updated event if logging should proceed, or nil if
 the event should be dropped. A middleware call which throws an exception will
 be ignored, and the original event will continue being processed.
 
-### Log Outputs
+### Event Outputs
 
 Finally, dialog needs to know how and where to send the logged events. These
 are configured under the `:outputs` key, which should contain a map from an
@@ -115,7 +118,7 @@ and the output type is used to write the formatted message to some destination.
 As a shorthand, an output with no other configuration can be specified just by
 its type keyword.
 
-#### Types
+#### Output Types
 
 There are four supported outputs:
 
@@ -132,8 +135,8 @@ There are four supported outputs:
 - `:file`
 
   An output which writes log messages to a local file. The output must contain
-  a `:path` entry which specifies the location of the log file. The output will
-  try to pre-create the parent directories of this file when it is initialized.
+  a `:path` entry which specifies the location of the log file. Dialog will try
+  to pre-create the parent directories of this file when it is initialized.
 
 - `:syslog`
 
@@ -144,8 +147,7 @@ There are four supported outputs:
   `:level` event attributes as special fields, in addition to the formatted
   message.
 
-
-#### Formats
+#### Message Formats
 
 There are four supported formats:
 
@@ -177,11 +179,11 @@ There are four supported formats:
   with middleware before they are output.
 
 To support further light customization, both the `:simple` and `:pretty`
-formatters will look for some metadata on events which will also be output. If
-an event has a `:dialog.format/tail` string metadata, it will be appended to
-the message produces by the formatters. If the event has
-`:dialog.format/extra`, it will also be printed as a data structure at the end
-of the message.
+formatters will look for some additional metadata on events:
+- If an event has a `:dialog.format/tail` string metadata, it will be appended
+  to the message produced by the formatters.
+- If the event has `:dialog.format/extra`, it will also be printed as a data
+  structure at the end of the message.
 
 
 ## License
