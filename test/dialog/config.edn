@@ -1,0 +1,2 @@
+{:level :trace
+ :outputs {:shh :null}}

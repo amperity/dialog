@@ -7,7 +7,7 @@
     java.io.StringWriter))
 
 
-(defmacro with-err-string
+(defmacro with-err-capture
   "Evaluate the body of expressions with the `*err*` stream bound to a string
   writer."
   [& body]
@@ -33,7 +33,7 @@
              (#'cfg/collect-prop-levels
               {"dialog.level." "warn"}))))
     (testing "with bad levels"
-      (with-err-string
+      (with-err-capture
         (is (= {}
                (#'cfg/collect-prop-levels
                 {"dialog.level.abc" "bad"
@@ -52,7 +52,7 @@
              (#'cfg/collect-env-levels
               {"DIALOG_LEVEL_" "warn"}))))
     (testing "with bad levels"
-      (with-err-string
+      (with-err-capture
         (is (= {}
                (#'cfg/collect-env-levels
                 {"DIALOG_LEVEL_ABC" "BAD"
@@ -69,7 +69,7 @@
 
 (deftest function-resolution
   (testing "with bad input"
-    (with-err-string
+    (with-err-capture
       (is (nil? (#'cfg/resolve-fn "test" 123)))
       (is (str/includes? (str *err*) "test function 123 is not a known type"))))
   (testing "with nil"
@@ -80,11 +80,11 @@
     (is (identical? #'str (#'cfg/resolve-fn "test" #'str))))
   (testing "with symbol"
     (testing "for missing namespace"
-      (with-err-string
+      (with-err-capture
         (is (nil? (#'cfg/resolve-fn "test" 'dialog.missing/foo)))
         (is (str/includes? (str *err*) "test function dialog.missing/foo could not be resolved"))))
     (testing "not found in ns"
-      (with-err-string
+      (with-err-capture
         (is (nil? (#'cfg/resolve-fn "test" 'dialog.config/foo)))
         (is (str/includes? (str *err*) "test function dialog.config/foo was not found"))))
     (testing "for fn"
@@ -98,7 +98,7 @@
            (#'cfg/resolve-middleware
             {:middleware []}))))
   (testing "with bad middleware"
-    (with-err-string
+    (with-err-capture
       (is (= {:middleware []}
              (#'cfg/resolve-middleware
               {:middleware [123 "abc"]})))))
@@ -113,7 +113,7 @@
     (testing "without init"
       (is (= {} (#'cfg/resolve-init {}))))
     (testing "with bad init"
-      (with-err-string
+      (with-err-capture
         (is (= {} (#'cfg/resolve-init {:init "bob"})))))
     (testing "with good init"
       (is (= {:init #'identity}
@@ -139,7 +139,7 @@
             "should not change config")))
     (testing "with error"
       (let [init (fn [_] (throw (RuntimeException. "BOOM")))]
-        (with-err-string
+        (with-err-capture
           (is (= {:level :info
                   :init init}
                  (#'cfg/apply-init
@@ -166,7 +166,7 @@
       (is (= {} (#'cfg/initialize-outputs {:foo nil}))
           "should omit output"))
     (testing "with bad config"
-      (with-err-string
+      (with-err-capture
         (is (= {}
                (#'cfg/initialize-outputs
                 {:non-map "xyz"
@@ -179,7 +179,7 @@
     (testing "with init error"
       (with-redefs [cfg/output-formatter (fn [_] formatter)
                     cfg/output-writer (fn [_] (throw (RuntimeException. "BOOM")))]
-        (with-err-string
+        (with-err-capture
           (is (= {}
                  (#'cfg/initialize-outputs
                   {:boom {:type :print}})))
@@ -196,4 +196,11 @@
 
 
 (deftest config-loading
-  (is (map? (cfg/load-config))))
+  (testing "default config"
+    (is (map? (cfg/load-config))))
+  (testing "with error"
+    (with-redefs [aero.core/read-config (fn [_resource _profile]
+                                          (throw (RuntimeException. "BOOM")))]
+      (with-err-capture
+        (is (map? (cfg/load-config)))
+        (is (str/includes? (str *err*) "failed to read dialog config file: BOOM"))))))
