@@ -25,6 +25,9 @@
    :vertical false
    :show-external false}
 
+  :cloverage
+  {:ns-exclude-regex #{#"dialog\.util"}}
+
   :profiles
   {:dev
    {:dependencies [[org.clojure/tools.logging "1.2.3"]]}

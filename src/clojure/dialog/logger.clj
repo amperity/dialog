@@ -135,11 +135,18 @@
   "Dynamically adjust the level for the named logger. If no name is provided,
   adjusts the level of the root logger. Returns nil."
   ([level]
-   {:pre [(valid-level? level)]}
+   (when-not (valid-level? level)
+     (throw (IllegalArgumentException.
+              (str "Provided level " (pr-str level) " is not valid"))))
    (alter-var-root #'config assoc :level level)
    (reset-level-cache!))
   ([logger level]
-   {:pre [(string? logger) (valid-level? level)]}
+   (when-not (string? logger)
+     (throw (IllegalArgumentException.
+              (str "Provided logger must be a string, got: " (pr-str logger)))))
+   (when-not (valid-level? level)
+     (throw (IllegalArgumentException.
+              (str "Provided level " (pr-str level) " is not valid"))))
    (alter-var-root #'config assoc-in [:levels logger] level)
    (reset-level-cache!)))
 
@@ -198,6 +205,22 @@
     middleware))
 
 
+(defn- write-output!
+  "Write an event to an output, applying any configured formatter."
+  [id output event]
+  (when-let [write! (:writer output)]
+    (try
+      (let [format-message (or (:formatter output) :message)
+            message (format-message event)]
+        (write! event message)
+        nil)
+      (catch Exception ex
+        (u/print-err :output
+                     "Failed to write to output %s: %s"
+                     (name id)
+                     (ex-message ex))))))
+
+
 (defn log-event
   "Pass an event into the logging system."
   [event]
@@ -208,19 +231,9 @@
                             (apply-defaults)
                             (apply-middleware (:middleware config))))]
     (run!
-      (fn write-output
+      (fn write-event
         [[id output]]
-        (try
-          (let [format-event (or (:formatter output) :message)
-                write-event (:writer output)]
-            (when write-event
-              (let [message (format-event event)]
-                (write-event event message))))
-          (catch Exception ex
-            (u/print-err :output
-                         "Failed to write to output %s: %s"
-                         (name id)
-                         (ex-message ex)))))
+        (write-output! id output event))
       (:outputs config))))
 
 
