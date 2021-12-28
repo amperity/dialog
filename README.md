@@ -47,12 +47,12 @@ runtime.
 At initialization time (when SLF4J looks on the classpath for the
 `StaticLoggerBinder` class), dialog will try to read configuration from a
 resource named `dialog/config.edn`. This is an [aero](https://github.com/juxt/aero/)
-file which should contain a map telling dialog how to behave. Check out the
-[sample config](dev/dialog/config.edn) used with the REPL in this repo for a
-comprehensive example.
+file which should contain a map telling dialog how to behave. The profile used
+to read the configuration should be set with the `dialog.profile` system
+property or `DIALOG_PROFILE` environment variable at runtime.
 
-In addition to the keys described below, the configuration map may have other
-custom entries, which will be ignored by dialog.
+Check out the [sample config](dev/dialog/config.edn) used with the REPL in this
+repo for a comprehensive example.
 
 ### Initialization Hook
 
@@ -70,13 +70,17 @@ config map.
 - `:level`
 
   This sets the level of the root logger, which is used if no other
-  more-specific threshold is configured.
+  more-specific threshold is configured. This may be overridden at runtime by
+  setting the `dialog.level` system property or the `DIALOG_LEVEL` environment
+  variable.
 
 - `:levels`
 
   This key should contain a map of logger prefixes to a configured level
   keyword. Loggers will use the _most specific_ prefix which matches when
-  determining their level.
+  determining their level. These may also be overridden at runtime with
+  `dialog.level.{logger.ns}` system properties or `DIALOG_LEVEL_{LOGGER_NS}`
+  environment variables.
 
 - `:blocked`
 
