@@ -1,7 +1,8 @@
 (ns dialog.output.file
   "Log appender which writes events to a file.
 
-  NOTE: this is *NOT* a performant implementation."
+  **NOTE:** this output is NOT safe for use when multiple processes are writing
+  to the same file!"
   (:require
     [clojure.java.io :as io])
   (:import

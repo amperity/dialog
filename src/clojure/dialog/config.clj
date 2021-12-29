@@ -237,19 +237,19 @@
   (let [profile (keyword (some-setting "DIALOG_PROFILE"
                                        "dialog.profile"
                                        :default))
-        base-config (merge {:level :info
-                            :outputs {:console :print}}
-                           (read-config profile))
         root-level (some-setting "DIALOG_LEVEL"
                                  "dialog.level"
-                                 nil)]
+                                 nil)
+        base-config (merge {:level :info
+                            :outputs {:console :print}}
+                           (read-config profile))]
     (->
       base-config
       (update :levels merge
               (collect-prop-levels)
               (collect-env-levels))
       (cond->
-        root-level
+        (Level/isValid root-level)
         (assoc :level (keyword root-level)))
       (resolve-init)
       (apply-init)
