@@ -179,12 +179,12 @@
                                     :level :info
                                     :message "heyo"})))
           (is (= [[:test :info "foo.bar.baz"]] @logged))))))
-  (testing "log-message"
+  (testing "-log-slf4j"
     (let [logged (atom [])]
       (with-redefs [log/log-event (fn [event]
                                     (swap! logged conj event)
                                     nil)]
-        (is (nil? (log/log-message "abc.xyz" :info "a thing happened" nil)))
+        (is (nil? (log/-log-slf4j "abc.xyz" :info "a thing happened" nil)))
         (is (= [{:level :info
                  :logger "abc.xyz"
                  :message "a thing happened"

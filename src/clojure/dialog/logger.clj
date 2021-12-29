@@ -246,9 +246,9 @@
       (:outputs config))))
 
 
-(defn log-message
-  "Pass a message into the logging system. Used primarily by the SLF4J logging
-  integration."
+(defn ^:no-doc -log-slf4j
+  "Pass a message into the logging system. Used by the SLF4J logging
+  integration - consumers should call `log-event` directly."
   [logger level msg err]
   (log-event {:level level
               :logger logger

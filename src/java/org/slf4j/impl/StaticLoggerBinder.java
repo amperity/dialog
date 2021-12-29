@@ -63,7 +63,7 @@ public final class StaticLoggerBinder {
             IFn getLevel = (IFn)resolve.invoke(getLevelName);
 
             // Resolve logging fn.
-            Symbol logMessageName = Symbol.intern("dialog.logger", "log-message");
+            Symbol logMessageName = Symbol.intern("dialog.logger", "-log-slf4j");
             IFn logMessage = (IFn)resolve.invoke(logMessageName);
 
             // Construct singleton
