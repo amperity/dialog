@@ -4,6 +4,9 @@
   :license {:name "MIT License"
             :url "https://mit-license.org/"}
 
+  :deploy-branches ["main"]
+  :pedantic? :abort
+
   :plugins
   [[lein-cloverage "1.2.2"]]
 
