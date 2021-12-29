@@ -87,10 +87,19 @@
       (str/starts-with? logger (str prefix \.))))
 
 
+(defn blocked?
+  "True if the logger is blocked by configuration, otherwise false."
+  [logger]
+  (boolean
+    (and (string? logger)
+         (some #(prefixed? logger %)
+               (:blocked config)))))
+
+
 (defn- match-block
   "Return `:off` if there is a blocking prefix matching this logger."
   [logger]
-  (when (first (filter #(prefixed? logger %) (:blocked config)))
+  (when (blocked? logger)
     :off))
 
 
