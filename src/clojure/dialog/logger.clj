@@ -256,7 +256,27 @@
               :error err}))
 
 
+(defn ^:no-doc -log-macro
+  "Pass a message into the logging system. Used by the logging macro
+  expansion - consumers should call `log-event` directly."
+  [event f x & more]
+  (log-event
+    (if (instance? Throwable x)
+      (assoc event
+             :message (apply f more)
+             :error x)
+      (assoc event
+             :message (apply f x more)))))
+
+
 ;; ## Logging APIs
+
+(defn- coverage-mode?
+  "True if the log macros should emit code in a 'coverage-friendly' mode."
+  []
+  (= "true" (or (System/getenv "DIALOG_COVERAGE")
+                (System/getProperty "dialog.coverage"))))
+
 
 (defmacro logp
   "Log a message using print style args. Can optionally take a throwable as its
@@ -265,26 +285,41 @@
   [level x & more]
   (let [logger (str (ns-name *ns*))
         line (:line (meta &form))]
-    (if (or (string? x) (nil? more))
-      `(when (enabled? ~logger ~level)
-         (log-event {:level ~level
-                     :logger ~logger
-                     :line ~line
-                     :message (print-str ~x ~@more)}))
-      `(let [logger# ~logger]
-         (when (enabled? logger# ~level)
-           (let [x# ~x
-                 more# (print-str ~@more)]
-             (if (instance? Throwable x#)
-               (log-event {:level ~level
-                           :logger logger#
-                           :line ~line
-                           :message more#
-                           :error x#})
-               (log-event {:level ~level
-                           :logger logger#
-                           :line ~line
-                           :message (str (print-str x#) " " more#)}))))))))
+    (cond
+      ;; Coverage-friendly form. Args are always evaluated and passed to the
+      ;; helper function.
+      (coverage-mode?)
+      `(-log-macro
+         {:logger ~logger
+          :level ~level
+          :line ~line}
+         print-str
+         ~x
+         ~@more)
+
+      ;; First argument can't be an error, use simpler form.
+      (or (string? x) (nil? more))
+      `(let [logger# ~logger
+             level# ~level]
+         (when (enabled? logger# level#)
+           (log-event
+             {:logger logger#
+              :level level#
+              :line ~line
+              :message (print-str ~x ~@more)})))
+
+      ;; General form.
+      :else
+      `(let [logger# ~logger
+             level# ~level]
+         (when (enabled? logger# level#)
+           (-log-macro
+             {:logger logger#
+              :level level#
+              :line ~line}
+             print-str
+             ~x
+             ~@more))))))
 
 
 (defmacro logf
@@ -294,25 +329,41 @@
   [level x & more]
   (let [logger (str (ns-name *ns*))
         line (:line (meta &form))]
-    (if (or (string? x) (nil? more))
-      `(when (enabled? ~logger ~level)
-         (log-event {:level ~level
-                     :logger ~logger
-                     :line ~line
-                     :message (format ~x ~@more)}))
-      `(let [logger# ~logger]
-         (when (enabled? logger# ~level)
-           (let [x# ~x]
-             (if (instance? Throwable x#)
-               (log-event {:level ~level
-                           :logger logger#
-                           :line ~line
-                           :message (format ~@more)
-                           :error x#})
-               (log-event {:level ~level
-                           :logger logger#
-                           :line ~line
-                           :message (format x# ~@more)}))))))))
+    (cond
+      ;; Coverage-friendly form. Args are always evaluated and passed to the
+      ;; helper function.
+      (coverage-mode?)
+      `(-log-macro
+         {:logger ~logger
+          :level ~level
+          :line ~line}
+         format
+         ~x
+         ~@more)
+
+      ;; First argument can't be an error, use simpler form.
+      (or (string? x) (nil? more))
+      `(let [logger# ~logger
+             level# ~level]
+         (when (enabled? logger# level#)
+           (log-event
+             {:logger logger#
+              :level level#
+              :line ~line
+              :message (format ~x ~@more)})))
+
+      ;; General form.
+      :else
+      `(let [logger# ~logger
+             level# ~level]
+         (when (enabled? logger# level#)
+           (-log-macro
+             {:logger logger#
+              :level level#
+              :line ~line}
+             format
+             ~x
+             ~@more))))))
 
 
 (defmacro trace
