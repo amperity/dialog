@@ -10,7 +10,13 @@
 
 
 (defn writer
-  "Construct a file event writer function."
+  "Construct a file event writer function.
+
+  Output options should include:
+
+  - `:path`
+
+    String path to the log file to write to."
   [output]
   (when-not (string? (:path output))
     (throw (IllegalArgumentException.

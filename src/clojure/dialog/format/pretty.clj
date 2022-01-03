@@ -85,7 +85,14 @@
 
 
 (defn formatter
-  "Construct a pretty event formatting function."
+  "Construct a pretty event formatting function.
+
+  Output options may include:
+
+  - `:timestamp`
+
+    Either `:full` (the default) which shows the entire timestamp value, or
+    `:short` which will render only the local time portion."
   [output]
   (let [format-time (timestamp-formatter (:timestamp output :full))]
     (fn format-message

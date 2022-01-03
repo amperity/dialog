@@ -142,7 +142,17 @@
 
 
 (defn writer
-  "Construct a syslog event writer function."
+  "Construct a syslog event writer function.
+
+  Output options may include:
+
+  - `:address`
+
+    String hostname or IP to send log events to. Defaults to the local host.
+
+  - `:port`
+
+    UDP port to send log events to. Defaults to the standard syslog port 514."
   [output]
   (let [conn (connect! (:address output) (:port output))]
     (fn write-event

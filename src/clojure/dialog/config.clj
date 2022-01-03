@@ -232,7 +232,7 @@
 
 (defn load-config
   "Read logging configuration from an EDN resource (if available) and set any
-  runtime overrides from JVM properties an the process environment."
+  runtime overrides from JVM properties and the process environment."
   []
   (let [profile (keyword (some-setting "DIALOG_PROFILE"
                                        "dialog.profile"

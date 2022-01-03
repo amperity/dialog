@@ -17,8 +17,8 @@
  ;; `DIALOG_LEVEL_<logger>`. Loggers use the most-specific level set in their
  ;; name hierarchy.
  :levels
- {"amperity" #profile {:repl :debug
-                       :default :info}
+ {"acme" #profile {:repl :debug
+                   :default :info}
   "vault" :info
   ,,,}
 
