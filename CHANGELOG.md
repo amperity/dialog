@@ -12,6 +12,10 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - The canonical configuration file is now `dialog.edn` instead of
   `dialog/config.edn`, though the original path is still loaded as a fallback.
 
+### Fixed
+- Ensure that dialog is initialized when events are logged. This fixes
+  standalone usage without SLF4J.
+
 
 ## 0.1.0 - 2021-12-29
 

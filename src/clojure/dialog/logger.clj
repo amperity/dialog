@@ -233,6 +233,8 @@
 (defn log-event
   "Pass an event into the logging system."
   [event]
+  (when-not config
+    (initialize!))
   (when-let [event (and (string? (:logger event))
                         (keyword? (:level event))
                         (enabled? (:logger event) (:level event))
