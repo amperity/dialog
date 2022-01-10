@@ -8,7 +8,9 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Unreleased
 
-...
+### Added
+- Added `:padding` option for the `:simple` and `:pretty` formatters to allow
+  disabling fixed-width printing for the thread, level, and logger names.
 
 
 ## 0.1.0 - 2021-12-29

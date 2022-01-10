@@ -48,6 +48,7 @@
                             :timestamp :short}}
            :main {:stdout {:type :print
                            :stream :stdout
-                           :format :simple}
+                           :format :simple
+                           :padding false}
                   :loggly {:type :syslog
                            :format :json}}}}
