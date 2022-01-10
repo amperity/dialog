@@ -1,6 +1,7 @@
 (ns dialog.config-test
   (:require
     [aero.core :as aero]
+    [clojure.java.io :as io]
     [clojure.string :as str]
     [clojure.test :refer [deftest testing is]]
     [dialog.config :as cfg])
@@ -200,7 +201,10 @@
   (testing "default config"
     (is (map? (cfg/load-config))))
   (testing "with error"
-    (with-redefs [aero/read-config (fn [_resource _profile]
+    (with-redefs [io/resource (fn [path]
+                                (is (= "dialog.edn" path))
+                                "config file resource")
+                  aero/read-config (fn [_resource _profile]
                                      (throw (RuntimeException. "BOOM")))]
       (with-err-capture
         (is (map? (cfg/load-config)))
