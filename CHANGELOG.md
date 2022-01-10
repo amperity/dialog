@@ -8,7 +8,9 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Unreleased
 
-...
+### Changed
+- The canonical configuration file is now `dialog.edn` instead of
+  `dialog/config.edn`, though the original path is still loaded as a fallback.
 
 
 ## 0.1.0 - 2021-12-29

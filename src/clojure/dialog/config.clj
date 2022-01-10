@@ -222,7 +222,8 @@
   "Read the raw configuration from an EDN resource. Returns nil if the resource
   is not found or can't be read."
   [profile]
-  (when-let [config-edn (io/resource "dialog/config.edn")]
+  (when-let [config-edn (or (io/resource "dialog.edn")
+                            (io/resource "dialog/config.edn"))]
     (try
       (aero/read-config config-edn {:profile profile})
       (catch Exception ex
