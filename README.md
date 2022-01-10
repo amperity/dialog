@@ -46,13 +46,13 @@ runtime.
 
 At initialization time (when SLF4J looks on the classpath for the
 `StaticLoggerBinder` class), dialog will try to read configuration from a
-resource named `dialog/config.edn`. This is an [aero](https://github.com/juxt/aero/)
+resource named `dialog.edn`. This is an [aero](https://github.com/juxt/aero/)
 file which should contain a map telling dialog how to behave. The profile used
 to read the configuration can be set with the `dialog.profile` system
 property or `DIALOG_PROFILE` environment variable at runtime.
 
-Check out the [sample config](dev/dialog/config.edn) in this repo for a
-comprehensive example.
+Check out the [sample config](dev/dialog.edn) in this repo for a comprehensive
+example.
 
 ### Initialization Hook
 
