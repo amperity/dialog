@@ -4,6 +4,12 @@ import clojure.lang.IFn;
 import clojure.lang.Keyword;
 import clojure.lang.RT;
 import clojure.lang.Symbol;
+import clojure.lang.Var;
+
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
 
 import org.slf4j.Logger;
 import org.slf4j.Marker;
@@ -12,7 +18,7 @@ import org.slf4j.Marker;
 /**
  * Logger interface for integrating with SLF4J.
  */
-public final class DialogLogger implements Logger {
+public final class DialogLogger implements Serializable, Logger {
 
     /**
      * Global version counter indicating that levels may have changed.
@@ -62,6 +68,35 @@ public final class DialogLogger implements Logger {
         this.getLevelFn = getLevelFn;
         this.logMessageFn = logMessageFn;
         this.cachedAt = -1;
+    }
+
+
+    ///// Serialization /////
+
+    /**
+     * Serialize this logger to an output stream.
+     *
+     * @param out  output stream to write to
+     */
+    private void writeObject(ObjectOutputStream out) throws IOException {
+        out.defaultWriteObject();
+    }
+
+
+    /**
+     * Deserialize a logger from an input stream.
+     *
+     * @param in  input stream to read from
+     */
+    private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
+        IFn require = RT.var("clojure.core", "require");
+        Symbol loggerNS = Symbol.intern("dialog.logger");
+
+        synchronized (RT.REQUIRE_LOCK) {
+            require.invoke(loggerNS);
+        }
+
+        in.defaultReadObject();
     }
 
 
