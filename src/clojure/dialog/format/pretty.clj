@@ -101,24 +101,31 @@
 
   - `:padding`
 
-    Either true (the default) to pad fields to standard fixed widths, or false
-    to print them as-is.
+    Either true (the default) to pad fields to standard fixed widths, false to
+    print them with no padding, or a map with `:level`, `:thread`, and `:logger`
+    widths to specify custom amounts.
 
   - `:timestamp`
 
     Either `:full` (the default) which shows the entire timestamp value, or
     `:short` which will render only the local time portion."
   [output]
-  (let [padding (if (:padding output true)
-                  {:thread 24
-                   :level 5
-                   :logger 30}
-                  {:thread 0
-                   :level 0
-                   :logger 0})
-        thread-width (:thread padding)
-        level-width (:level padding)
-        logger-width (:logger padding)
+  (let [padding (:padding output true)
+        widths (merge
+                 {:level 5
+                  :thread 24
+                  :logger 30}
+                 (cond
+                   (map? padding)
+                   padding
+
+                   (false? padding)
+                   {:level 0
+                    :thread 0
+                    :logger 0}))
+        thread-width (:thread widths)
+        level-width (:level widths)
+        logger-width (:logger widths)
         format-time (timestamp-formatter (:timestamp output :full))]
     (fn format-message
       [event]

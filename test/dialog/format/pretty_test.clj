@@ -105,6 +105,14 @@
                           :logger "foo.bar.baz"
                           :error ex})]
         (is (str/includes? message "java.lang.RuntimeException: BOOM"))))
+    (testing "with custom padding"
+      (let [fmt (comp ansi/strip-ansi (pretty/formatter {:padding {:thread 10, :logger 15}}))]
+        (is (= "2021-12-27T15:33:18Z [main]     INFO  acme.main        Hello, logger!"
+               (fmt {:time inst
+                     :level :info
+                     :logger "acme.main"
+                     :message "Hello, logger!"
+                     :thread "main"})))))
     (testing "without padding"
       (let [fmt (comp ansi/strip-ansi (pretty/formatter {:padding false}))]
         (is (= "2021-12-27T15:33:18Z [thread-pool-123] INFO foo.bar.baz  Hello, logger!"
