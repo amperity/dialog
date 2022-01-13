@@ -5,15 +5,33 @@
     [clojure.string :as str]))
 
 
+(defn- field-widths
+  "Determine the configured field padding widths for the output formatter."
+  [output]
+  (let [padding (:padding output true)]
+    (merge
+      {:level 5
+       :thread 24
+       :logger 30}
+      (cond
+        (map? padding)
+        padding
+
+        (false? padding)
+        {:level 0
+         :thread 0
+         :logger 0}))))
+
+
 (defn- rpad
   "Pad a string on the right with spaces to make it fit a certain visual width."
   [string width]
-  (if (zero? width)
-    string
+  (if (pos-int? width)
     (let [vlen (count string)]
       (if (<= width vlen)
         string
-        (apply str string (repeat (- width vlen) " "))))))
+        (apply str string (repeat (- width vlen) " "))))
+    string))
 
 
 (defn- format-thread
@@ -39,21 +57,9 @@
     print them with no padding, or a map with `:level`, `:thread`, and `:logger`
     widths to specify custom amounts."
   [output]
-  (let [padding (:padding output true)
-        widths (merge
-                 {:level 5
-                  :thread 24
-                  :logger 30}
-                 (cond
-                   (map? padding)
-                   padding
-
-                   (false? padding)
-                   {:level 0
-                    :thread 0
-                    :logger 0}))
-        thread-width (:thread widths)
+  (let [widths (field-widths output)
         level-width (:level widths)
+        thread-width (:thread widths)
         logger-width (:logger widths)]
     (fn format-event
       [event]

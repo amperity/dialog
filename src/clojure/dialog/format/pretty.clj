@@ -13,15 +13,33 @@
       DateTimeFormatter)))
 
 
+(defn- field-widths
+  "Determine the configured field padding widths for the output formatter."
+  [output]
+  (let [padding (:padding output true)]
+    (merge
+      {:level 5
+       :thread 24
+       :logger 30}
+      (cond
+        (map? padding)
+        padding
+
+        (false? padding)
+        {:level 0
+         :thread 0
+         :logger 0}))))
+
+
 (defn- rpad
   "Pad a string on the right with spaces to make it fit a certain visual width."
   [string width]
-  (if (zero? width)
-    string
+  (if (pos-int? width)
     (let [vlen (ansi/visual-length string)]
       (if (<= width vlen)
         string
-        (apply str string (repeat (- width vlen) " "))))))
+        (apply str string (repeat (- width vlen) " "))))
+    string))
 
 
 (defn- timestamp-formatter
@@ -70,7 +88,7 @@
   (ansi/cyan
     (cond
       ;; Don't do trimming
-      (zero? max-length)
+      (not (pos-int? max-length))
       logger
 
       ;; Logger name fits in limit
@@ -110,21 +128,9 @@
     Either `:full` (the default) which shows the entire timestamp value, or
     `:short` which will render only the local time portion."
   [output]
-  (let [padding (:padding output true)
-        widths (merge
-                 {:level 5
-                  :thread 24
-                  :logger 30}
-                 (cond
-                   (map? padding)
-                   padding
-
-                   (false? padding)
-                   {:level 0
-                    :thread 0
-                    :logger 0}))
-        thread-width (:thread widths)
+  (let [widths (field-widths output)
         level-width (:level widths)
+        thread-width (:thread widths)
         logger-width (:logger widths)
         format-time (timestamp-formatter (:timestamp output :full))]
     (fn format-message
