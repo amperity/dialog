@@ -13,13 +13,33 @@
       DateTimeFormatter)))
 
 
+(defn- field-widths
+  "Determine the configured field padding widths for the output formatter."
+  [output]
+  (let [padding (:padding output true)]
+    (merge
+      {:level 5
+       :thread 24
+       :logger 30}
+      (cond
+        (map? padding)
+        padding
+
+        (false? padding)
+        {:level 0
+         :thread 0
+         :logger 0}))))
+
+
 (defn- rpad
   "Pad a string on the right with spaces to make it fit a certain visual width."
   [string width]
-  (let [vlen (ansi/visual-length string)]
-    (if (<= width vlen)
-      string
-      (apply str string (repeat (- width vlen) " ")))))
+  (if (pos-int? width)
+    (let [vlen (ansi/visual-length string)]
+      (if (<= width vlen)
+        string
+        (apply str string (repeat (- width vlen) " "))))
+    string))
 
 
 (defn- timestamp-formatter
@@ -66,7 +86,17 @@
   "Format a logger name to fit within the desired max length."
   [logger max-length]
   (ansi/cyan
-    (if (< max-length (count logger))
+    (cond
+      ;; Don't do trimming
+      (not (pos-int? max-length))
+      logger
+
+      ;; Logger name fits in limit
+      (<= (count logger) max-length)
+      logger
+
+      ;; Collapse logger segments
+      :else
       (loop [collapsed []
              parts (str/split logger #"\.")]
         (let [candidate (str/join "." (concat collapsed parts))]
@@ -79,22 +109,30 @@
               ;; No more parts, just truncate it.
               (subs candidate 0 max-length))
             ;; Abbreviated logger fits within limit.
-            candidate)))
-      ;; Logger name fits in limit.
-      logger)))
+            candidate))))))
 
 
 (defn formatter
   "Construct a pretty event formatting function.
 
-  Output options may include:
+  Formatting options may include:
+
+  - `:padding`
+
+    Either true (the default) to pad fields to standard fixed widths, false to
+    print them with no padding, or a map with `:level`, `:thread`, and `:logger`
+    widths to specify custom amounts.
 
   - `:timestamp`
 
     Either `:full` (the default) which shows the entire timestamp value, or
     `:short` which will render only the local time portion."
   [output]
-  (let [format-time (timestamp-formatter (:timestamp output :full))]
+  (let [widths (field-widths output)
+        level-width (:level widths)
+        thread-width (:thread widths)
+        logger-width (:logger widths)
+        format-time (timestamp-formatter (:timestamp output :full))]
     (fn format-message
       [event]
       (str
@@ -102,13 +140,13 @@
         (format-time (:time event))
         " "
         ;; Thread
-        (rpad (format-thread (:thread event)) 24)
+        (rpad (format-thread (:thread event)) thread-width)
         " "
         ;; Level
-        (rpad (format-level (:level event)) 5)
+        (rpad (format-level (:level event)) level-width)
         " "
         ;; Logger
-        (rpad (format-logger (str (:logger event)) 30) 30)
+        (rpad (format-logger (str (:logger event)) logger-width) logger-width)
         "  "
         ;; Message
         (or (:message event) "-")

@@ -5,13 +5,33 @@
     [clojure.string :as str]))
 
 
+(defn- field-widths
+  "Determine the configured field padding widths for the output formatter."
+  [output]
+  (let [padding (:padding output true)]
+    (merge
+      {:level 5
+       :thread 24
+       :logger 30}
+      (cond
+        (map? padding)
+        padding
+
+        (false? padding)
+        {:level 0
+         :thread 0
+         :logger 0}))))
+
+
 (defn- rpad
   "Pad a string on the right with spaces to make it fit a certain visual width."
   [string width]
-  (let [vlen (count string)]
-    (if (<= width vlen)
-      string
-      (apply str string (repeat (- width vlen) " ")))))
+  (if (pos-int? width)
+    (let [vlen (count string)]
+      (if (<= width vlen)
+        string
+        (apply str string (repeat (- width vlen) " "))))
+    string))
 
 
 (defn- format-thread
@@ -27,34 +47,46 @@
 
 
 (defn formatter
-  "Construct a plain-text event formatting function."
-  [_output]
-  (fn format-event
-    [event]
-    (str
-      ;; Timestamp
-      (str (:time event))
-      " "
-      ;; Thread
-      (rpad (format-thread (:thread event)) 24)
-      " "
-      ;; Level
-      (rpad (format-level (:level event)) 5)
-      " "
-      ;; Logger
-      (rpad (str (:logger event)) 30)
-      "  "
-      ;; Message
-      (or (:message event) "-")
-      ;; Duration
-      (when-let [duration (:duration event)]
-        (format " (%.3f ms)" duration))
-      ;; Custom trailer
-      (when-let [tail (:dialog.format/tail (meta event))]
-        (str " " tail))
-      ;; Extra Data
-      (when-let [extra (:dialog.format/extra (meta event))]
-        (str "  " (pr-str extra)))
-      ;; Exceptions
-      (when-let [ex (:error event)]
-        (str "\n" (with-out-str (stacktrace/print-cause-trace ex)))))))
+  "Construct a plain-text event formatting function.
+
+  Formatting options may include:
+
+  - `:padding`
+
+    Either true (the default) to pad fields to standard fixed widths, false to
+    print them with no padding, or a map with `:level`, `:thread`, and `:logger`
+    widths to specify custom amounts."
+  [output]
+  (let [widths (field-widths output)
+        level-width (:level widths)
+        thread-width (:thread widths)
+        logger-width (:logger widths)]
+    (fn format-event
+      [event]
+      (str
+        ;; Timestamp
+        (str (:time event))
+        " "
+        ;; Thread
+        (rpad (format-thread (:thread event)) thread-width)
+        " "
+        ;; Level
+        (rpad (format-level (:level event)) level-width)
+        " "
+        ;; Logger
+        (rpad (str (:logger event)) logger-width)
+        "  "
+        ;; Message
+        (or (:message event) "-")
+        ;; Duration
+        (when-let [duration (:duration event)]
+          (format " (%.3f ms)" duration))
+        ;; Custom trailer
+        (when-let [tail (:dialog.format/tail (meta event))]
+          (str " " tail))
+        ;; Extra Data
+        (when-let [extra (:dialog.format/extra (meta event))]
+          (str "  " (pr-str extra)))
+        ;; Exceptions
+        (when-let [ex (:error event)]
+          (str "\n" (with-out-str (stacktrace/print-cause-trace ex))))))))
