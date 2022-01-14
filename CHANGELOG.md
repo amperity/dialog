@@ -19,6 +19,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 ### Fixed
 - Ensure that dialog is initialized when events are logged. This fixes
   standalone usage without SLF4J.
+- Logger instances are now serializable, to support cases where a class being
+  serialized declares a non-static logger field.
 
 
 ## 0.1.0 - 2021-12-29

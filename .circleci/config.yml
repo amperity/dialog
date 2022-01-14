@@ -66,6 +66,9 @@ jobs:
             - ~/.m2
       - run: lein check
       - run: lein test
+      - run:
+          name: "Check logger serialization"
+          command: ./test/check-logger-serialization.sh
 
   coverage:
     executor: clojure
