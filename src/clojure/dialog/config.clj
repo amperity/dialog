@@ -199,9 +199,10 @@
       :else
       (try
         (let [output (merge {:format :simple} output)]
-          [id (assoc output
-                     :formatter (output-formatter output)
-                     :writer (output-writer output))])
+          [id (-> output
+                  (resolve-middleware)
+                  (assoc :formatter (output-formatter output)
+                         :writer (output-writer output)))])
         (catch Exception ex
           (print-err "output %s could not be initialized: %s %s"
                      id

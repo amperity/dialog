@@ -51,4 +51,5 @@
                            :format :simple
                            :padding false}
                   :loggly {:type :syslog
-                           :format :json}}}}
+                           :format :json
+                           :middleware [acme.logging/filter-syslog]}}}}

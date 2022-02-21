@@ -8,7 +8,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
-...
+### Added
+- Add support for output-specific middleware.
 
 
 ## [0.2.0] - 2022-01-14
