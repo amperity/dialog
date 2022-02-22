@@ -8,12 +8,19 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+...
+
+
+## [0.3.0] - 2022-02-22
+
 ### Added
 - Add support for output-specific middleware.
+  [PR#4](https://github.com/amperity/dialog/pull/4)
 
 ### Changed
 - The JSON formatter is much more defensive about unknown types and will
   default to stringifying them when found.
+  [PR#5](https://github.com/amperity/dialog/pull/5)
 
 
 ## [0.2.0] - 2022-01-14
@@ -21,7 +28,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 ### Added
 - Added `:padding` option for the `:simple` and `:pretty` formatters to allow
   control of the fixed-width printing for the thread, level, and logger names.
-  [#2](https://github.com/amperity/dialog/pull/2)
+  [PR#2](https://github.com/amperity/dialog/pull/2)
 
 ### Changed
 - The canonical configuration file is now `dialog.edn` instead of
@@ -32,7 +39,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
   standalone usage without SLF4J.
 - Logger instances are now serializable, to support cases where a class being
   serialized declares a non-static logger field.
-  [#3](https://github.com/amperity/dialog/pull/3)
+  [PR#3](https://github.com/amperity/dialog/pull/3)
 
 
 ## 0.1.0 - 2021-12-29
@@ -40,5 +47,6 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 Initial release.
 
 
-[Unreleased]: https://github.com/amperity/ken/compare/0.2.0...HEAD
+[Unreleased]: https://github.com/amperity/ken/compare/0.3.0...HEAD
+[0.3.0]: https://github.com/amperity/ken/compare/0.2.0...0.3.0
 [0.2.0]: https://github.com/amperity/ken/compare/0.1.0...0.2.0
