@@ -5,11 +5,18 @@
     [io.aviso.exception :as ex]))
 
 
-(defn- kw->str
-  "Coerce a keyword into a string, preserving its namespace."
+(defn- key-fn
+  "Coerce a map key into a string for use as a JSON object property."
   [k]
-  (when k
-    (subs (str k) 1)))
+  (cond
+    (nil? k)
+    "nil"
+
+    (keyword? k)
+    (subs (str k) 1)
+
+    :else
+    (str k)))
 
 
 (defn- sanitize-stack-frame
@@ -38,14 +45,43 @@
         (ex/analyze-exception ex {})))
 
 
+(defn- value-fn
+  "Coerce a value into a valid JSON type."
+  ([_k v]
+   (value-fn v))
+  ([v]
+   (cond
+     (or (nil? v)
+         (boolean? v)
+         (number? v)
+         (string? v)
+         (inst? v)
+         (uuid? v))
+     v
+
+     (keyword? v)
+     (key-fn v)
+
+     (instance? java.util.Map v)
+     v
+
+     (instance? java.util.Collection v)
+     (mapv value-fn v)
+
+     (instance? java.lang.Exception v)
+     (render-exception v)
+
+     :else
+     (str v))))
+
+
 (defn formatter
   "Construct a JSON event formatting function."
   [_output]
   (fn format-event
     [event]
     (json/write-str
-      (cond-> event
-        (:error event)
-        (update :error render-exception))
-      :key-fn kw->str
+      event
+      :key-fn key-fn
+      :value-fn value-fn
       :escape-slash false)))
