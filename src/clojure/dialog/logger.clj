@@ -244,7 +244,8 @@
     (run!
       (fn write-event
         [[id output]]
-        (write-output! id output event))
+        (when-let [event (apply-middleware event (:middleware output))]
+          (write-output! id output event)))
       (:outputs config))))
 
 

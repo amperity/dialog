@@ -106,6 +106,9 @@ function should return an updated event if logging should proceed, or nil if
 the event should be dropped. A middleware call which throws an exception will
 be ignored, and the original event will continue being processed.
 
+Top-level middleware will be applied to all events; middleware may also be
+applied to individual outputs for more specific processing.
+
 ### Event Outputs
 
 Finally, dialog needs to know how and where to send the logged events. These
