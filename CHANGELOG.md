@@ -11,6 +11,10 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 ### Added
 - Add support for output-specific middleware.
 
+### Changed
+- The JSON formatter is much more defensive about unknown types and will
+  default to stringifying them when found.
+
 
 ## [0.2.0] - 2022-01-14
 

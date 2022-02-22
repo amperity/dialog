@@ -176,10 +176,9 @@ There are four supported formats:
 - `:json`
 
   This renders the event data directly as JSON, which can be useful for outputs
-  which will be read by structured logging tools. This uses the Clojure
-  `data.json` library, so you can extend the `clojure.data.json/JSONWriter`
-  protocol if you need to support custom types. Alternately, transform them
-  with middleware before they are output.
+  which will be read by structured logging tools. If you need custom formatting
+  for certain types, you can transform them with middleware before they are
+  output.
 
 To support further light customization, both the `:simple` and `:pretty`
 formatters will look for some additional metadata on events:
