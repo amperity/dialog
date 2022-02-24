@@ -8,7 +8,11 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
-...
+### Fixed
+- Use SLF4J message formatter to correctly interpret formatting anchors (`{}`)
+  and throwables in the `DialogLogger` implementation.
+  [#6](https://github.com/amperity/dialog/issues/6)
+  [PR#7](https://github.com/amperity/dialog/pull/7)
 
 
 ## [0.3.0] - 2022-02-22
