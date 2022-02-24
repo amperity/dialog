@@ -13,6 +13,8 @@ import java.io.Serializable;
 
 import org.slf4j.Logger;
 import org.slf4j.Marker;
+import org.slf4j.helpers.FormattingTuple;
+import org.slf4j.helpers.MessageFormatter;
 
 
 /**
@@ -169,6 +171,18 @@ public final class DialogLogger implements Serializable, Logger {
     }
 
 
+    /**
+     * Convenience method which unpacks a FormattingTuple before calling
+     * logMessage.
+     *
+     * @param level  log level enum
+     * @param tuple  formatted result
+     */
+    private void logMessage(Level level, FormattingTuple tuple) {
+        logMessage(level, tuple.getMessage(), tuple.getThrowable());
+    }
+
+
     ///// TRACE Methods /////
 
     @Override
@@ -194,7 +208,7 @@ public final class DialogLogger implements Serializable, Logger {
     @Override
     public void trace(String format, Object arg) {
         if (isEnabled(Level.TRACE)) {
-            logMessage(Level.TRACE, String.format(format, arg), null);
+            logMessage(Level.TRACE, MessageFormatter.format(format, arg));
         }
     }
 
@@ -202,7 +216,7 @@ public final class DialogLogger implements Serializable, Logger {
     @Override
     public void trace(String format, Object arg1, Object arg2) {
         if (isEnabled(Level.TRACE)) {
-            logMessage(Level.TRACE, String.format(format, arg1, arg2), null);
+            logMessage(Level.TRACE, MessageFormatter.format(format, arg1, arg2));
         }
     }
 
@@ -210,7 +224,7 @@ public final class DialogLogger implements Serializable, Logger {
     @Override
     public void trace(String format, Object... args) {
         if (isEnabled(Level.TRACE)) {
-            logMessage(Level.TRACE, String.format(format, args), null);
+            logMessage(Level.TRACE, MessageFormatter.arrayFormat(format, args));
         }
     }
 
@@ -234,7 +248,7 @@ public final class DialogLogger implements Serializable, Logger {
     @Override
     public void trace(Marker marker, String format, Object arg) {
         if (isEnabled(Level.TRACE)) {
-            logMessage(Level.TRACE, String.format(format, arg), null);
+            logMessage(Level.TRACE, MessageFormatter.format(format, arg));
         }
     }
 
@@ -242,7 +256,7 @@ public final class DialogLogger implements Serializable, Logger {
     @Override
     public void trace(Marker marker, String format, Object arg1, Object arg2) {
         if (isEnabled(Level.TRACE)) {
-            logMessage(Level.TRACE, String.format(format, arg1, arg2), null);
+            logMessage(Level.TRACE, MessageFormatter.format(format, arg1, arg2));
         }
     }
 
@@ -250,7 +264,7 @@ public final class DialogLogger implements Serializable, Logger {
     @Override
     public void trace(Marker marker, String format, Object... args) {
         if (isEnabled(Level.TRACE)) {
-            logMessage(Level.TRACE, String.format(format, args), null);
+            logMessage(Level.TRACE, MessageFormatter.arrayFormat(format, args));
         }
     }
 
@@ -288,7 +302,7 @@ public final class DialogLogger implements Serializable, Logger {
     @Override
     public void debug(String format, Object arg) {
         if (isEnabled(Level.DEBUG)) {
-            logMessage(Level.DEBUG, String.format(format, arg), null);
+            logMessage(Level.DEBUG, MessageFormatter.format(format, arg));
         }
     }
 
@@ -296,7 +310,7 @@ public final class DialogLogger implements Serializable, Logger {
     @Override
     public void debug(String format, Object arg1, Object arg2) {
         if (isEnabled(Level.DEBUG)) {
-            logMessage(Level.DEBUG, String.format(format, arg1, arg2), null);
+            logMessage(Level.DEBUG, MessageFormatter.format(format, arg1, arg2));
         }
     }
 
@@ -304,7 +318,7 @@ public final class DialogLogger implements Serializable, Logger {
     @Override
     public void debug(String format, Object... args) {
         if (isEnabled(Level.DEBUG)) {
-            logMessage(Level.DEBUG, String.format(format, args), null);
+            logMessage(Level.DEBUG, MessageFormatter.arrayFormat(format, args));
         }
     }
 
@@ -328,7 +342,7 @@ public final class DialogLogger implements Serializable, Logger {
     @Override
     public void debug(Marker marker, String format, Object arg) {
         if (isEnabled(Level.DEBUG)) {
-            logMessage(Level.DEBUG, String.format(format, arg), null);
+            logMessage(Level.DEBUG, MessageFormatter.format(format, arg));
         }
     }
 
@@ -336,7 +350,7 @@ public final class DialogLogger implements Serializable, Logger {
     @Override
     public void debug(Marker marker, String format, Object arg1, Object arg2) {
         if (isEnabled(Level.DEBUG)) {
-            logMessage(Level.DEBUG, String.format(format, arg1, arg2), null);
+            logMessage(Level.DEBUG, MessageFormatter.format(format, arg1, arg2));
         }
     }
 
@@ -344,7 +358,7 @@ public final class DialogLogger implements Serializable, Logger {
     @Override
     public void debug(Marker marker, String format, Object... args) {
         if (isEnabled(Level.DEBUG)) {
-            logMessage(Level.DEBUG, String.format(format, args), null);
+            logMessage(Level.DEBUG, MessageFormatter.arrayFormat(format, args));
         }
     }
 
@@ -382,7 +396,7 @@ public final class DialogLogger implements Serializable, Logger {
     @Override
     public void info(String format, Object arg) {
         if (isEnabled(Level.INFO)) {
-            logMessage(Level.INFO, String.format(format, arg), null);
+            logMessage(Level.INFO, MessageFormatter.format(format, arg));
         }
     }
 
@@ -390,7 +404,7 @@ public final class DialogLogger implements Serializable, Logger {
     @Override
     public void info(String format, Object arg1, Object arg2) {
         if (isEnabled(Level.INFO)) {
-            logMessage(Level.INFO, String.format(format, arg1, arg2), null);
+            logMessage(Level.INFO, MessageFormatter.format(format, arg1, arg2));
         }
     }
 
@@ -398,7 +412,7 @@ public final class DialogLogger implements Serializable, Logger {
     @Override
     public void info(String format, Object... args) {
         if (isEnabled(Level.INFO)) {
-            logMessage(Level.INFO, String.format(format, args), null);
+            logMessage(Level.INFO, MessageFormatter.arrayFormat(format, args));
         }
     }
 
@@ -422,7 +436,7 @@ public final class DialogLogger implements Serializable, Logger {
     @Override
     public void info(Marker marker, String format, Object arg) {
         if (isEnabled(Level.INFO)) {
-            logMessage(Level.INFO, String.format(format, arg), null);
+            logMessage(Level.INFO, MessageFormatter.format(format, arg));
         }
     }
 
@@ -430,7 +444,7 @@ public final class DialogLogger implements Serializable, Logger {
     @Override
     public void info(Marker marker, String format, Object arg1, Object arg2) {
         if (isEnabled(Level.INFO)) {
-            logMessage(Level.INFO, String.format(format, arg1, arg2), null);
+            logMessage(Level.INFO, MessageFormatter.format(format, arg1, arg2));
         }
     }
 
@@ -438,7 +452,7 @@ public final class DialogLogger implements Serializable, Logger {
     @Override
     public void info(Marker marker, String format, Object... args) {
         if (isEnabled(Level.INFO)) {
-            logMessage(Level.INFO, String.format(format, args), null);
+            logMessage(Level.INFO, MessageFormatter.arrayFormat(format, args));
         }
     }
 
@@ -476,7 +490,7 @@ public final class DialogLogger implements Serializable, Logger {
     @Override
     public void warn(String format, Object arg) {
         if (isEnabled(Level.WARN)) {
-            logMessage(Level.WARN, String.format(format, arg), null);
+            logMessage(Level.WARN, MessageFormatter.format(format, arg));
         }
     }
 
@@ -484,7 +498,7 @@ public final class DialogLogger implements Serializable, Logger {
     @Override
     public void warn(String format, Object arg1, Object arg2) {
         if (isEnabled(Level.WARN)) {
-            logMessage(Level.WARN, String.format(format, arg1, arg2), null);
+            logMessage(Level.WARN, MessageFormatter.format(format, arg1, arg2));
         }
     }
 
@@ -492,7 +506,7 @@ public final class DialogLogger implements Serializable, Logger {
     @Override
     public void warn(String format, Object... args) {
         if (isEnabled(Level.WARN)) {
-            logMessage(Level.WARN, String.format(format, args), null);
+            logMessage(Level.WARN, MessageFormatter.arrayFormat(format, args));
         }
     }
 
@@ -516,7 +530,7 @@ public final class DialogLogger implements Serializable, Logger {
     @Override
     public void warn(Marker marker, String format, Object arg) {
         if (isEnabled(Level.WARN)) {
-            logMessage(Level.WARN, String.format(format, arg), null);
+            logMessage(Level.WARN, MessageFormatter.format(format, arg));
         }
     }
 
@@ -524,7 +538,7 @@ public final class DialogLogger implements Serializable, Logger {
     @Override
     public void warn(Marker marker, String format, Object arg1, Object arg2) {
         if (isEnabled(Level.WARN)) {
-            logMessage(Level.WARN, String.format(format, arg1, arg2), null);
+            logMessage(Level.WARN, MessageFormatter.format(format, arg1, arg2));
         }
     }
 
@@ -532,7 +546,7 @@ public final class DialogLogger implements Serializable, Logger {
     @Override
     public void warn(Marker marker, String format, Object... args) {
         if (isEnabled(Level.WARN)) {
-            logMessage(Level.WARN, String.format(format, args), null);
+            logMessage(Level.WARN, MessageFormatter.arrayFormat(format, args));
         }
     }
 
@@ -570,7 +584,7 @@ public final class DialogLogger implements Serializable, Logger {
     @Override
     public void error(String format, Object arg) {
         if (isEnabled(Level.ERROR)) {
-            logMessage(Level.ERROR, String.format(format, arg), null);
+            logMessage(Level.ERROR, MessageFormatter.format(format, arg));
         }
     }
 
@@ -578,7 +592,7 @@ public final class DialogLogger implements Serializable, Logger {
     @Override
     public void error(String format, Object arg1, Object arg2) {
         if (isEnabled(Level.ERROR)) {
-            logMessage(Level.ERROR, String.format(format, arg1, arg2), null);
+            logMessage(Level.ERROR, MessageFormatter.format(format, arg1, arg2));
         }
     }
 
@@ -586,7 +600,7 @@ public final class DialogLogger implements Serializable, Logger {
     @Override
     public void error(String format, Object... args) {
         if (isEnabled(Level.ERROR)) {
-            logMessage(Level.ERROR, String.format(format, args), null);
+            logMessage(Level.ERROR, MessageFormatter.format(format, args));
         }
     }
 
@@ -610,7 +624,7 @@ public final class DialogLogger implements Serializable, Logger {
     @Override
     public void error(Marker marker, String format, Object arg) {
         if (isEnabled(Level.ERROR)) {
-            logMessage(Level.ERROR, String.format(format, arg), null);
+            logMessage(Level.ERROR, MessageFormatter.format(format, arg));
         }
     }
 
@@ -618,7 +632,7 @@ public final class DialogLogger implements Serializable, Logger {
     @Override
     public void error(Marker marker, String format, Object arg1, Object arg2) {
         if (isEnabled(Level.ERROR)) {
-            logMessage(Level.ERROR, String.format(format, arg1, arg2), null);
+            logMessage(Level.ERROR, MessageFormatter.format(format, arg1, arg2));
         }
     }
 
@@ -626,7 +640,7 @@ public final class DialogLogger implements Serializable, Logger {
     @Override
     public void error(Marker marker, String format, Object... args) {
         if (isEnabled(Level.ERROR)) {
-            logMessage(Level.ERROR, String.format(format, args), null);
+            logMessage(Level.ERROR, MessageFormatter.arrayFormat(format, args));
         }
     }
 
