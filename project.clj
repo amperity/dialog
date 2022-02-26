@@ -1,4 +1,4 @@
-(defproject com.amperity/dialog "0.3.1-SNAPSHOT"
+(defproject com.amperity/dialog "0.3.1"
   :description "Logging library for integration with Ken and various outputs."
   :url "https://github.com/amperity/dialog"
   :license {:name "MIT License"
