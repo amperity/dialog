@@ -8,6 +8,11 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+...
+
+
+## [0.3.2] - 2022-04-08
+
 ### Changed
 - Remove shell call to `hostname` to infer the default computer hostname. This
   caused the Clojure Agent send-off pool to be started at logging init time,
@@ -64,7 +69,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 Initial release.
 
 
-[Unreleased]: https://github.com/amperity/ken/compare/0.3.1...HEAD
+[Unreleased]: https://github.com/amperity/ken/compare/0.3.2...HEAD
+[0.3.2]: https://github.com/amperity/ken/compare/0.3.1...0.3.2
 [0.3.1]: https://github.com/amperity/ken/compare/0.3.0...0.3.1
 [0.3.0]: https://github.com/amperity/ken/compare/0.2.0...0.3.0
 [0.2.0]: https://github.com/amperity/ken/compare/0.1.0...0.2.0
