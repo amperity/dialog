@@ -1,5 +1,5 @@
 (ns ^:no-doc dialog.util
-  "Implemenation utilities."
+  "Implementation utilities."
   (:import
     java.net.InetAddress))
 
