@@ -8,7 +8,14 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
-...
+### Changed
+- Remove shell call to `hostname` to infer the default computer hostname. This
+  caused the Clojure Agent send-off pool to be started at logging init time,
+  which was an unacceptable side-effect.
+
+### Added
+- The default hostname can now be modified with `dialog.util/set-hostname!` if
+  necessary.
 
 
 ## [0.3.1] - 2022-02-25
