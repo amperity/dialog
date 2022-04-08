@@ -1,8 +1,5 @@
 (ns ^:no-doc dialog.util
-  "Implemenation utilities."
-  (:require
-    [clojure.java.shell :as sh]
-    [clojure.string :as str])
+  "Implementation utilities."
   (:import
     java.net.InetAddress))
 
@@ -67,25 +64,32 @@
 
 ;; ## Miscellaneous
 
-(let [hostname (delay
-                 (or (try
-                       (let [proc (sh/sh "hostname")]
-                         (when (zero? (:exit proc))
-                           (str/trim (:out proc))))
-                       (catch Exception ex
-                         (print-err :hostname
-                                    "Failed to resolve hostname with command: %s"
-                                    (ex-message ex))
-                         nil))
-                     (try
+(def ^:private hostname-ref
+  "A stateful reference to hold the current default hostname."
+  (atom nil))
+
+
+(defn set-hostname!
+  "Set the default hostname to use in log events. Returns nil."
+  [hostname]
+  (when-not (string? hostname)
+    (throw (IllegalArgumentException.
+             (str "Hostname must be a string, got a "
+                  (pr-str (class hostname))))))
+  (reset! hostname-ref hostname)
+  nil)
+
+
+(defn get-hostname
+  "Get the string name of the local host computer."
+  []
+  (or @hostname-ref
+      (let [hostname (try
                        (.getHostName (InetAddress/getLocalHost))
                        (catch Exception ex
                          (print-err :hostname
                                     "Failed to resolve hostname with InetAddress: %s"
                                     (ex-message ex))
-                         nil))
-                     "localhost"))]
-  (defn get-hostname
-    "Get the string name of the local host computer."
-    []
-    @hostname))
+                         "localhost"))]
+        (reset! hostname-ref hostname)
+        hostname)))
