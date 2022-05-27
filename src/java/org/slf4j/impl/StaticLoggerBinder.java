@@ -24,7 +24,7 @@ public final class StaticLoggerBinder {
      *
      * This should be kept in sync with the version declared in `project.clj`.
      */
-    public static final String REQUESTED_API_VERSION = "1.7.32";
+    public static final String REQUESTED_API_VERSION = "1.7.36";
 
 
     /**
