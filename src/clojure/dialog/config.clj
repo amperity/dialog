@@ -42,7 +42,7 @@
 
 
 (defn- collect-root-level
-  "Choose the dialog root logger level keyword by look at the environment and
+  "Choose the dialog root logger level keyword by looking at the environment and
   system properties."
   []
   (some->
