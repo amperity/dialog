@@ -11,7 +11,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 ...
 
 
-## [1.0.0] - 2022-06-01
+## [1.0.1] - 2022-06-01
 
 No major behavioral changes in this release, but it does mark the "officially
 stable" version of the library after much production usage.
@@ -19,6 +19,11 @@ stable" version of the library after much production usage.
 ### Changed
 - Updated a handful of dependencies.
   [PR#9](https://github.com/amperity/dialog/pull/9)
+
+### Fixed
+- Fixed a `ClassCastException` when setting the root logger level with an
+  environment or system property override.
+  [PR#10](https://github.com/amperity/dialog/pull/10)
 
 
 ## [0.3.2] - 2022-04-08
@@ -79,8 +84,8 @@ stable" version of the library after much production usage.
 Initial release.
 
 
-[Unreleased]: https://github.com/amperity/dialog/compare/1.0.0...HEAD
-[1.0.0]: https://github.com/amperity/dialog/compare/0.3.2...1.0.0
+[Unreleased]: https://github.com/amperity/dialog/compare/1.0.1...HEAD
+[1.0.1]: https://github.com/amperity/dialog/compare/0.3.2...1.0.1
 [0.3.2]: https://github.com/amperity/dialog/compare/0.3.1...0.3.2
 [0.3.1]: https://github.com/amperity/dialog/compare/0.3.0...0.3.1
 [0.3.0]: https://github.com/amperity/dialog/compare/0.2.0...0.3.0
