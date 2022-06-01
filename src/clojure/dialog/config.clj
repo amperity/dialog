@@ -32,6 +32,27 @@
       default))
 
 
+(defn- select-profile
+  "Choose the dialog profile keyword by looking at the environment and system
+  properties."
+  []
+  (keyword (some-setting "DIALOG_PROFILE"
+                         "dialog.profile"
+                         :default)))
+
+
+(defn- collect-root-level
+  "Choose the dialog root logger level keyword by looking at the environment and
+  system properties."
+  []
+  (some->
+    (some-setting "DIALOG_LEVEL"
+                  "dialog.level"
+                  nil)
+    (str/lower-case)
+    (keyword)))
+
+
 (defn- collect-prop-levels
   "Look in the JVM system properties for logger level configs. Returns a map of
   collected level settings."
@@ -236,12 +257,8 @@
   "Read logging configuration from an EDN resource (if available) and set any
   runtime overrides from JVM properties and the process environment."
   []
-  (let [profile (keyword (some-setting "DIALOG_PROFILE"
-                                       "dialog.profile"
-                                       :default))
-        root-level (some-setting "DIALOG_LEVEL"
-                                 "dialog.level"
-                                 nil)
+  (let [profile (select-profile)
+        root-level (collect-root-level)
         base-config (merge {:level :info
                             :outputs {:console :print}}
                            (read-config profile))]
@@ -252,7 +269,7 @@
               (collect-env-levels))
       (cond->
         (Level/isValid root-level)
-        (assoc :level (keyword root-level)))
+        (assoc :level root-level))
       (resolve-init)
       (apply-init)
       (resolve-middleware)
