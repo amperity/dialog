@@ -13,9 +13,9 @@
   :dependencies
   [[org.clojure/clojure "1.11.1"]
    [org.clojure/data.json "2.4.0"]
-   [org.slf4j/slf4j-api "1.7.36"]
-   [org.slf4j/jul-to-slf4j "1.7.36"]
-   [org.slf4j/jcl-over-slf4j "1.7.36"]
+   [org.slf4j/slf4j-api "2.0.3"]
+   [org.slf4j/jul-to-slf4j "2.0.3"]
+   [org.slf4j/jcl-over-slf4j "2.0.3"]
    [io.aviso/pretty "1.1.1"]
    [aero "1.1.6"]]
 
