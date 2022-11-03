@@ -5,7 +5,8 @@
     [dialog.format.pretty :as pretty]
     [io.aviso.ansi :as ansi])
   (:import
-    java.time.Instant))
+    java.time.Instant
+    java.util.Locale))
 
 
 (deftest timestamp-formatting
@@ -52,7 +53,7 @@
 
 
 (deftest message-formatting
-  (let [fmt (comp ansi/strip-ansi (pretty/formatter {}))
+  (let [fmt (comp ansi/strip-ansi (pretty/formatter {:locale Locale/US}))
         inst (Instant/parse "2021-12-27T15:33:18Z")]
     (testing "basic format"
       (is (= "2021-12-27T15:33:18Z [thread-pool-123]        INFO  foo.bar.baz                     Hello, logger!"

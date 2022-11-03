@@ -10,7 +10,9 @@
       LocalDateTime
       ZoneId)
     (java.time.format
-      DateTimeFormatter)))
+      DateTimeFormatter)
+    (java.util
+      Locale)))
 
 
 (defn- field-widths
@@ -112,6 +114,11 @@
             candidate))))))
 
 
+(defn- format-duration
+  [locale fmt duration]
+  (String/format locale fmt (to-array [duration])))
+
+
 (defn formatter
   "Construct a pretty event formatting function.
 
@@ -126,13 +133,20 @@
   - `:timestamp`
 
     Either `:full` (the default) which shows the entire timestamp value, or
-    `:short` which will render only the local time portion."
+    `:short` which will render only the local time portion.
+   
+  - `:locale`
+
+    The locale to use when formatting dureation. 
+    Defaults to default platform locale (java.util.Locale/getDefault)."
   [output]
   (let [widths (field-widths output)
         level-width (:level widths)
         thread-width (:thread widths)
         logger-width (:logger widths)
-        format-time (timestamp-formatter (:timestamp output :full))]
+        format-time (timestamp-formatter (:timestamp output :full))
+        locale (or (:locale output)
+                   (Locale/getDefault))]
     (fn format-message
       [event]
       (str
@@ -152,7 +166,7 @@
         (or (:message event) "-")
         ;; Duration
         (when-let [duration (:duration event)]
-          (format " (%.3f ms)" duration))
+          (format-duration locale " (%.3f ms)" duration))
         ;; Custom trailer
         (when-let [tail (:dialog.format/tail (meta event))]
           (str " " tail))

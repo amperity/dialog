@@ -5,7 +5,8 @@
     [dialog.format.simple :as simple]
     [io.aviso.ansi :as ansi])
   (:import
-    java.time.Instant))
+    java.time.Instant
+    java.util.Locale))
 
 
 (deftest thread-formatting
@@ -25,7 +26,7 @@
 
 
 (deftest message-formatting
-  (let [fmt (simple/formatter {})
+  (let [fmt (simple/formatter {:locale Locale/US})
         inst (Instant/parse "2021-12-27T15:33:18Z")]
     (testing "basic format"
       (is (= "2021-12-27T15:33:18Z [thread-pool-123]        INFO  foo.bar.baz                     Hello, logger!"
@@ -80,7 +81,8 @@
                             :error ex}))]
         (is (str/includes? message "java.lang.RuntimeException: BOOM"))))
     (testing "with custom padding"
-      (let [fmt (simple/formatter {:padding {:thread 10, :logger 15}})]
+      (let [fmt (simple/formatter {:padding {:thread 10, :logger 15}
+                                   :locale Locale/US})]
         (is (= "2021-12-27T15:33:18Z [main]     INFO  acme.main        Hello, logger!"
                (fmt {:time inst
                      :level :info
@@ -88,7 +90,8 @@
                      :message "Hello, logger!"
                      :thread "main"})))))
     (testing "without padding"
-      (let [fmt (simple/formatter {:padding false})]
+      (let [fmt (simple/formatter {:padding false
+                                   :locale Locale/US})]
         (is (= "2021-12-27T15:33:18Z [thread-pool-123] INFO foo.bar.baz  Hello, logger!"
                (fmt {:time inst
                      :level :info

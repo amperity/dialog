@@ -2,7 +2,9 @@
   "Log format which presents events in simple plain text."
   (:require
     [clojure.stacktrace :as stacktrace]
-    [clojure.string :as str]))
+    [clojure.string :as str])
+  (:import
+    java.util.Locale))
 
 
 (defn- field-widths
@@ -46,6 +48,11 @@
   (str/upper-case (name level)))
 
 
+(defn- format-duration
+  [locale fmt duration]
+  (String/format locale fmt (to-array [duration])))
+
+
 (defn formatter
   "Construct a plain-text event formatting function.
 
@@ -55,12 +62,19 @@
 
     Either true (the default) to pad fields to standard fixed widths, false to
     print them with no padding, or a map with `:level`, `:thread`, and `:logger`
-    widths to specify custom amounts."
+    widths to specify custom amounts.
+
+  - `:locale`
+
+    The locale to use when formatting dureation. 
+    Defaults to default platform locale (java.util.Locale/getDefault)."
   [output]
   (let [widths (field-widths output)
         level-width (:level widths)
         thread-width (:thread widths)
-        logger-width (:logger widths)]
+        logger-width (:logger widths)
+        locale (or (:locale output)
+                   (Locale/getDefault))]
     (fn format-event
       [event]
       (str
@@ -80,7 +94,7 @@
         (or (:message event) "-")
         ;; Duration
         (when-let [duration (:duration event)]
-          (format " (%.3f ms)" duration))
+          (format-duration locale " (%.3f ms)" duration))
         ;; Custom trailer
         (when-let [tail (:dialog.format/tail (meta event))]
           (str " " tail))
