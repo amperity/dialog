@@ -9,3 +9,8 @@
 .clj-kondo/.cache
 pom.xml
 pom.xml.asc
+
+.cpcache
+.calva/output-window
+.lsp/.cache
+.portal/
