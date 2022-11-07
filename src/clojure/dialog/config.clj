@@ -105,7 +105,7 @@
   [x constants]
   (or (fn? x)
       (var? x)
-      (symbol? x)
+      (qualified-symbol? x)
       (contains? constants x)))
 
 
