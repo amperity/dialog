@@ -17,6 +17,16 @@
      ~@body))
 
 
+(defn- custom-writer
+  [output]
+  (constantly (:custom output)))
+
+
+(defn- meow-formatter
+  [_output]
+  #(str "meow " (:message %) " meow"))
+
+
 (deftest setting-priority
   (is (= (System/getenv "HOME") (#'cfg/some-setting "HOME" "user.home" "~")))
   (System/setProperty "dialog.config-test.abc" "xyz")
@@ -152,8 +162,8 @@
 
 
 (deftest output-initialization
-  (let [formatter (fn [])
-        writer (fn [])]
+  (let [formatter (fn [_])
+        writer (fn [_ _])]
     (testing "with keyword shorthand"
       (with-redefs [cfg/output-formatter (fn [_] formatter)
                     cfg/output-writer (fn [_] writer)]
@@ -194,7 +204,18 @@
                           :formatter formatter
                           :writer writer}}
                (#'cfg/initialize-outputs
-                {:console {:type :print}})))))))
+                {:console {:type :print}})))))
+    (testing "custom constructors"
+      (let [outputs (#'cfg/initialize-outputs
+                     `{:custom {:type custom-writer
+                                :format meow-formatter
+                                :custom 123}})
+            formatter (get-in outputs [:custom :formatter])
+            writer (get-in outputs [:custom :writer])]
+        (is (fn? formatter))
+        (is (= "meow hello meow" (formatter {:message "hello"})))
+        (is (fn? writer))
+        (is (= 123 (writer {,,,} "...")))))))
 
 
 (deftest config-loading

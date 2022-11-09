@@ -99,6 +99,16 @@
            env))))
 
 
+(defn- resolvable?
+  "True if the provided value can be resolved to a function by being a
+  reference or one of a set of known keywords."
+  [x constants]
+  (or (fn? x)
+      (var? x)
+      (qualified-symbol? x)
+      (contains? constants x)))
+
+
 (defn- resolve-fn
   "Safely resolve the given value to a function. Returns the function, or prints
   an error and returns nil."
@@ -164,21 +174,29 @@
 (defn- output-formatter
   "Construct an output formatting function."
   [output]
-  (case (:format output)
-    :message :message
-    :simple  (fmt.simple/formatter output)
-    :pretty  (fmt.pretty/formatter output)
-    :json    (fmt.json/formatter output)))
+  (let [fmt (:format output)]
+    (if (keyword? fmt)
+      (case fmt
+        :message :message
+        :simple  (fmt.simple/formatter output)
+        :pretty  (fmt.pretty/formatter output)
+        :json    (fmt.json/formatter output))
+      (let [constructor (resolve-fn "formatter constructor" fmt)]
+        (constructor output)))))
 
 
 (defn- output-writer
   "Construct an output writing function."
   [output]
-  (case (:type output)
-    :null   nil
-    :file   (out.file/writer output)
-    :print  (out.print/writer output)
-    :syslog (out.syslog/writer output)))
+  (let [typ (:type output)]
+    (if (keyword? typ)
+      (case (:type output)
+        :null   nil
+        :file   (out.file/writer output)
+        :print  (out.print/writer output)
+        :syslog (out.syslog/writer output))
+      (let [constructor (resolve-fn "output constructor" typ)]
+        (constructor output)))))
 
 
 (defn- initialize-output
@@ -202,16 +220,15 @@
                  (pr-str output))
 
       ;; Check that output type is understood.
-      (not (contains? #{:null :file :print :syslog}
-                      (:type output)))
+      (not (resolvable? (:type output) #{:null :file :print :syslog}))
       (print-err "output %s has invalid type: %s"
                  id
                  (:type output))
 
       ;; Check that format type is understood.
       (and (contains? output :format)
-           (not (contains? #{:message :simple :pretty :json}
-                           (:format output))))
+           (not (resolvable? (:format output)
+                             #{:message :simple :pretty :json})))
       (print-err "output %s has invalid format: %s"
                  id
                  (:format output))

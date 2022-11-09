@@ -123,7 +123,7 @@ its type keyword.
 
 #### Output Types
 
-There are four supported outputs:
+There are four built-in outputs:
 
 - `:null`
 
@@ -150,9 +150,14 @@ There are four supported outputs:
   `:level` event attributes as special fields, in addition to the formatted
   message.
 
+If you need an output that is not already provided, you can write your own by
+specifying a qualified symbol for the output `:type`. During initialization,
+this will be resolved to a var and called with the output map to construct the
+writer function. Check out the existing output types for examples.
+
 #### Message Formats
 
-There are four supported formats:
+There are four built-in formats:
 
 - `:message`
 
@@ -186,6 +191,11 @@ formatters will look for some additional metadata on events:
   to the message produced by the formatters.
 - If the event has `:dialog.format/extra`, it will also be printed as a data
   structure at the end of the message.
+
+Similar to the output writers, if you want more control over the format you can
+provide your own function by specifying a qualified symbol as the `:format`.
+This will be resolved to a var during initialization and called on events to
+produce the message string.
 
 
 ## License

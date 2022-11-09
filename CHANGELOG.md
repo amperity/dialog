@@ -8,7 +8,10 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
-...
+### Added
+- Custom output writers and formatters can be used by providing a symbol for
+  the output's `:type` and `:format` keys. The symbol will be resolved to a var
+  at config time and called with the output map.
 
 
 ## [1.0.1] - 2022-06-01
