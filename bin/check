@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+
+CLJ_CHECK_GIT="https://github.com/athos/clj-check.git"
+CLJ_CHECK_SHA="0ca84df1357d71429243b99908303f45a934654c"
+
+exec clojure \
+    -Sdeps '{:deps {athos/clj-check {:git/url "'$CLJ_CHECK_GIT'", :git/sha "'$CLJ_CHECK_SHA'", :git/tag "0.1.0"}}}' \
+    -M -m clj-check.check \
+    src/clojure
