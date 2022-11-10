@@ -200,6 +200,6 @@ produce the message string.
 
 ## License
 
-Copyright © 2021 Amperity, Inc.
+Copyright © 2022 Amperity, Inc.
 
 Distributed under the MIT License.
