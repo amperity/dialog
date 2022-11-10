@@ -30,6 +30,8 @@
   :test
   {:extra-paths ["test"]
    :extra-deps {lambdaisland/kaocha {:mvn/version "1.71.1119"}}
+   :jvm-opts ["-Duser.language=en"
+              "-Duser.country=US"]
    :main-opts ["-m" "kaocha.runner"]}
 
   :coverage

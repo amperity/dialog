@@ -5,12 +5,7 @@
     [dialog.format.simple :as simple]
     [io.aviso.ansi :as ansi])
   (:import
-    java.time.Instant
-    java.util.Locale))
-
-
-;; fix locale for tests so there are no formatting test failure on non US platforms
-(Locale/setDefault Locale/US)
+    java.time.Instant))
 
 
 (deftest thread-formatting
