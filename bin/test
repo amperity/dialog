@@ -1,3 +1,6 @@
 #!/usr/bin/env bash
+# vim: ft=bash
+
+bin/compile
 
 exec clojure -M:test "$@"

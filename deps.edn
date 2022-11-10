@@ -1,9 +1,6 @@
-{:paths ["src/clojure" "target/classes"]
-
- :deps/prep-lib
- {:ensure "target/classes"
-  :alias :build
-  :fn javac}
+{:paths
+ ["src/clojure"
+  "target/classes"]
 
  :deps
  {org.clojure/clojure {:mvn/version "1.11.1"}
@@ -13,6 +10,11 @@
   org.slf4j/jcl-over-slf4j {:mvn/version "1.7.36"}
   io.aviso/pretty {:mvn/version "1.1.1"}
   aero/aero {:mvn/version "1.1.6"}}
+
+ :deps/prep-lib
+ {:ensure "target/classes"
+  :alias :build
+  :fn javac}
 
  :aliases
  {:repl
@@ -27,11 +29,17 @@
 
   :test
   {:extra-paths ["test"]
-   :main-opts ["-m" "kaocha.runner"]
-   :extra-deps {lambdaisland/kaocha {:mvn/version "1.71.1119"}}}
+   :extra-deps {lambdaisland/kaocha {:mvn/version "1.71.1119"}}
+   :main-opts ["-m" "kaocha.runner"]}
+
+  :coverage
+  {:extra-paths ["test"]
+   :extra-deps {cloverage/cloverage {:mvn/version "RELEASE"}}
+   :main-opts ["-m" "cloverage.coverage"]}
 
   :build
   {:deps {org.clojure/clojure {:mvn/version "1.11.1"}
           org.slf4j/slf4j-api {:mvn/version "1.7.36"}
-          org.clojure/tools.build {:mvn/version "0.8.4"}}
+          org.clojure/tools.build {:mvn/version "0.8.4"}
+          slipset/deps-deploy {:mvn/version "0.2.0"}}
    :ns-default build}}}

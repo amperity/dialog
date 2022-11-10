@@ -9,6 +9,10 @@ Dialog uses Clojure's CLI tooling, `deps.edn`, and `tools.build` for development
 To start a basic REPL, use `clj`:
 
 ```bash
+# compile class files at least once after checkout
+bin/compile
+
+# start a REPL
 clj -M:repl
 ```
 
@@ -29,4 +33,31 @@ bin/test
 
 # watch and rerun tests
 bin/test --watch
+```
+
+To compute test coverage with [cloverage](https://github.com/cloverage/cloverage):
+
+```bash
+bin/coverage
+```
+
+
+## Build Jar
+
+For compiling code and building a JAR file, dialog uses `tools.build`. The
+various commands can be found in the [`build.clj`](../build.clj) file and
+invoked with the `-T:build` alias or the bin script:
+
+```bash
+# clean artifacts
+bin/build clean
+
+# create a jar
+bin/build jar
+
+# install to local repo
+bin/build install
+
+# deploy to Clojars
+bin/build deploy
 ```

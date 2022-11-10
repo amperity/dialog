@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+# vim: ft=bash
+
+find-latest() {
+    local file latest
+    for file in $(find "$1" -type f -name "*.$2"); do
+        [[ -z $latest || $file -nt $latest ]] && latest=$file
+    done
+    echo $latest
+}
+
+if [[ ! -d target/classes || $(find-latest src/java java) -nt $(find-latest target/classes class) ]]; then
+    echo "Compiling Java class files"
+    clojure -T:build javac
+fi
