@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# vim: ft=bash
 
 # Check that the runtime var-resolution for hot-reloading support in
 # DialogLogger is commented it out.

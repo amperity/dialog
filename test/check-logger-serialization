@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# vim: ft=bash
 
 # Check that instances of the `dialog.logger.DialogLogger` class serialize
 # correctly.
@@ -21,7 +22,7 @@ cat > target/classes/dialog.edn <<EOF
 EOF
 
 echo "Building classpath..."
-readonly CLASSPATH="$(lein classpath 2> /dev/null)"
+readonly CLASSPATH="$(clojure -Spath 2> /dev/null)"
 
 echo "Compiling classes..."
 java -cp "$CLASSPATH" clojure.main - <<EOF
