@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+# vim: ft=bash
+
+if [[ $1 = clean ]]; then
+    rm -rf target
+else
+    exec clojure -T:build "$@"
+fi

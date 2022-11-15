@@ -4,7 +4,7 @@ version: 2.1
 executors:
   clojure:
     docker:
-      - image: circleci/clojure:lein-2.9.1
+      - image: cimg/clojure:1.11-openjdk-11.0
     working_directory: ~/repo
 
 
@@ -32,7 +32,7 @@ jobs:
       - run:
           name: Install clj-kondo
           environment:
-            CLJ_KONDO_VERSION: 2021.12.19
+            CLJ_KONDO_VERSION: 2022.11.02
           command: |
             wget https://github.com/borkdude/clj-kondo/releases/download/v${CLJ_KONDO_VERSION}/clj-kondo-${CLJ_KONDO_VERSION}-linux-amd64.zip
             unzip clj-kondo-${CLJ_KONDO_VERSION}-linux-amd64.zip
@@ -46,10 +46,10 @@ jobs:
       - checkout
       - run:
           name: "Check declared SLF4J version"
-          command: ./test/check-api-version.sh
+          command: test/check-api-version
       - run:
           name: "Check for dynamic resolution"
-          command: ./test/check-dynamic-resolves.sh
+          command: test/check-dynamic-resolves
 
   test:
     executor: clojure
@@ -57,18 +57,18 @@ jobs:
       - checkout
       - restore_cache:
           keys:
-            - v1-test-{{ checksum "project.clj" }}
+            - v1-test-{{ checksum "deps.edn" }}
             - v1-test-
-      - run: lein with-profile +test deps
+      - run: bin/compile
+      - run: bin/check
+      - run: bin/test
       - save_cache:
-          key: v1-test-{{ checksum "project.clj" }}
+          key: v1-test-{{ checksum "deps.edn" }}
           paths:
             - ~/.m2
-      - run: lein check
-      - run: lein test
       - run:
           name: "Check logger serialization"
-          command: ./test/check-logger-serialization.sh
+          command: test/check-logger-serialization
 
   coverage:
     executor: clojure
@@ -76,16 +76,16 @@ jobs:
       - checkout
       - restore_cache:
           keys:
-            - v1-coverage-{{ checksum "project.clj" }}
+            - v1-coverage-{{ checksum "deps.edn" }}
             - v1-coverage-
             - v1-test-
       - run:
           name: Generate test coverage
-          command: lein cloverage --codecov
+          command: bin/coverage --codecov
       - save_cache:
           paths:
             - ~/.m2
-          key: v1-coverage-{{ checksum "project.clj" }}
+          key: v1-coverage-{{ checksum "deps.edn" }}
       - store_artifacts:
           path: target/coverage
           destination: coverage
