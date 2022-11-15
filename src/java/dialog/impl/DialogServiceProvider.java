@@ -1,4 +1,4 @@
-package dialog.logger;
+package dialog.impl;
 
 import clojure.lang.IFn;
 import clojure.lang.RT;

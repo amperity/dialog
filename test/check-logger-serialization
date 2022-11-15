@@ -6,6 +6,8 @@
 
 set -eo pipefail
 
+readonly JAVA_OPTS="-Dclojure.main.report=stderr"
+
 cd "$(dirname "${BASH_SOURCE[0]}")/.."
 
 readonly TEST_DIR="target/test"
@@ -25,13 +27,13 @@ echo "Building classpath..."
 readonly CLASSPATH="$(clojure -Spath 2> /dev/null)"
 
 echo "Compiling classes..."
-java -cp "$CLASSPATH" clojure.main - <<EOF
+java "$JAVA_OPTS" -cp "$CLASSPATH" clojure.main - <<EOF
 (binding [*compile-path* "target/classes"]
   (compile 'dialog.logger))
 EOF
 
 echo "Serializing logger..."
-java -cp "$CLASSPATH" clojure.main - <<EOF
+java "$JAVA_OPTS" -cp "$CLASSPATH" clojure.main - <<EOF
 (require '[clojure.java.io :as io])
 
 (def logger (org.slf4j.LoggerFactory/getLogger "foo.bar.baz"))
@@ -61,7 +63,7 @@ readonly FIRST_LOG="$(cat "$TEST_LOG")"
 rm "$TEST_LOG"
 
 echo "Deserializing logger..."
-java -cp "$CLASSPATH" clojure.main - <<EOF
+java "$JAVA_OPTS" -cp "$CLASSPATH" clojure.main - <<EOF
 (require '[clojure.java.io :as io])
 
 (with-open [in (java.io.ObjectInputStream. (io/input-stream (io/file "$TEST_OBJ")))]
