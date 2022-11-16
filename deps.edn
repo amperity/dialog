@@ -37,6 +37,8 @@
   :coverage
   {:extra-paths ["test"]
    :extra-deps {cloverage/cloverage {:mvn/version "RELEASE"}}
+   :jvm-opts ["-Duser.language=en"
+              "-Duser.country=US"]
    :main-opts ["-m" "cloverage.coverage"]}
 
   :build
