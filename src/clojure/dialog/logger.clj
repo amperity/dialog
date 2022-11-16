@@ -45,12 +45,14 @@
   "Global logging configuration reference."
   nil)
 
+(declare reset-level-cache!)
 
 (defn initialize!
   "Load and initialize the logging system configuration."
   []
   (let [cfg (config/load-config)]
     (alter-var-root #'config (constantly cfg))
+    (reset-level-cache!)
     nil))
 
 
