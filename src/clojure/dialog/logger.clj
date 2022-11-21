@@ -93,29 +93,37 @@
 
 (defn blocked?
   "True if the logger is blocked by configuration, otherwise false."
-  [logger]
-  (boolean
-    (and (string? logger)
-         (some #(prefixed? logger %)
-               (:blocked config)))))
+  ([logger]
+   (blocked? (:blocked config) logger))
+  ([levels logger]
+   (boolean
+     (and (string? logger)
+          (some #(prefixed? logger %)
+                levels)))))
 
 
-(defn- match-block
+(defn match-block
   "Return `:off` if there is a blocking prefix matching this logger."
-  [logger]
-  (when (blocked? logger)
-    :off))
+  ([logger]
+   (when (blocked? logger)
+     :off))
+  ([levels logger]
+   (when (blocked? levels logger)
+     :off)))
 
 
-(defn- match-level
+(defn match-level
   "Get the value for the key which is the deepest prefix of the given logger
-  name, or nil if no keys prefix the logger."
-  [logger]
-  (when-let [match (->> (:levels config)
-                        (sort-by (comp count key) (comp - compare))
-                        (filter #(prefixed? logger (key %)))
-                        (first))]
-    (val match)))
+  name, or nil if no keys prefix the logger.
+  Uses :levels from config by default."
+  ([logger]
+   (match-level (:levels config) logger))
+  ([levels logger]
+   (when-let [match (->> levels
+                         (sort-by (comp count key) (comp - compare))
+                         (filter #(prefixed? logger (key %)))
+                         (first))]
+     (val match))))
 
 
 (defn valid-level?
@@ -133,15 +141,21 @@
 (defn get-level
   "Get the current level setting for a logger. If no logger name is provided,
   this returns the root logger's level."
-  ([]
+  (^:deprecated []
    (or (:level config) :info))
   ([logger]
-   (or (get @level-cache logger)
-       (let [level (or (match-block logger)
-                       (match-level logger)
-                       (get-level))]
-         (swap! level-cache assoc logger level)
-         level))))
+   (get-level {:level (:level config)
+               :levels (:levels config)
+               :blocked (:blocked config)
+               :level-cache level-cache} logger))
+  ([options logger]
+   (let [{:keys [level blocked levels level-cache]} options]
+     (or (get @level-cache logger)
+         (let [level (or (match-block blocked logger)
+                         (match-level levels logger)
+                         level)]
+           (swap! level-cache assoc logger level)
+           level)))))
 
 
 (defn set-level!
@@ -174,10 +188,16 @@
 
 (defn enabled?
   "True if the given logger is enabled at the provided level."
-  [logger level]
-  (Level/isAllowed
-    (Level/ofKeyword (get-level logger))
-    (Level/ofKeyword level)))
+  ([logger level]
+   (enabled? {:level (:level config)
+              :levels (:levels config)
+              :blocked (:blocked config)
+              :level-cache level-cache}
+             logger level))
+  ([opts logger level]
+   (Level/isAllowed
+     (Level/ofKeyword (get-level opts logger))
+     (Level/ofKeyword level))))
 
 
 ;; ## Event Logging
