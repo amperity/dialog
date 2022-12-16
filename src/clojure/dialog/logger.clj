@@ -91,18 +91,24 @@
       (str/starts-with? logger (str prefix \.))))
 
 
+(defn ^:private some-prefixed?
+  "Return true if logger is a prefix of at least one item in prefixes."
+  [prefixes logger]
+  (boolean
+    (and (string? logger)
+         (some #(prefixed? logger %)
+               prefixes))))
+
+
 (defn blocked?
   "True if the logger is blocked by configuration, otherwise false."
   ([logger]
    (blocked? (:blocked config) logger))
-  ([levels logger]
-   (boolean
-     (and (string? logger)
-          (some #(prefixed? logger %)
-                levels)))))
+  ([blocked logger]
+   (some-prefixed? blocked logger)))
 
 
-(defn match-block
+(defn- match-block
   "Return `:off` if there is a blocking prefix matching this logger."
   ([logger]
    (when (blocked? logger)
@@ -138,17 +144,8 @@
   (:levels config))
 
 
-(defn get-level
-  "Get the current level setting for a logger. If no logger name is provided,
-  this returns the root logger's level."
-  (^:deprecated []
-   (or (:level config) :info))
-  ([logger]
-   (get-level {:level (:level config)
-               :levels (:levels config)
-               :blocked (:blocked config)
-               :level-cache level-cache} logger))
-  ([options logger]
+(defn get-level*
+  ([logger options]
    (let [{:keys [level blocked levels level-cache]} options]
      (or (get @level-cache logger)
          (let [level (or (match-block blocked logger)
@@ -156,6 +153,18 @@
                          level)]
            (swap! level-cache assoc logger level)
            level)))))
+
+
+(defn get-level
+  "Get the current level setting for a logger. If no logger name is provided,
+  this returns the root logger's level."
+  ([]
+   (or (:level config) :info))
+  ([logger]
+   (get-level* logger {:level (:level config)
+                       :levels (:levels config)
+                       :blocked (:blocked config)
+                       :level-cache level-cache})))
 
 
 (defn set-level!
@@ -196,7 +205,7 @@
              logger level))
   ([opts logger level]
    (Level/isAllowed
-     (Level/ofKeyword (get-level opts logger))
+     (Level/ofKeyword (get-level* logger opts))
      (Level/ofKeyword level))))
 
 
