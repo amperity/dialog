@@ -157,3 +157,19 @@ Similar to the output writers, if you want more control over the format you can
 provide your own function by specifying a qualified symbol as the `:format`.
 This will be resolved to a var during initialization and called on events to
 produce the message string.
+
+### Output Levels
+
+If you need to override the global levels for events on specific outputs, you
+can provide the same `:level` and `:levels` settings [described above](#logger-levels).
+These will let you adjust the thresholds for events being written to each
+specific output, but note the following caveats:
+
+- You can only raise logger thresholds, not lower them - if an event is not
+  logged because it doesn't meet the global threshold for that logger, it will
+  never be sent to the outputs for evaluation.
+- Output levels do not have the same performance optimizations as the global
+  levels, because the results are not cached and the event has to have made it
+  from the SLF4J framework into a Clojure event map and handed to Dialog.
+- You cannot adjust output levels dynamically, short of reloading the whole
+  config. (This is why there is no `:blocked` equivalent.)
