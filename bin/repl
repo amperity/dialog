@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+# vim: ft=bash
+
+cd "$(dirname "${BASH_SOURCE[0]}")/.."
+
+bin/build javac
+
+exec clj -M:repl "$@"
