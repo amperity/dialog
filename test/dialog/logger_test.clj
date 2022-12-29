@@ -32,7 +32,8 @@
                            "baz" :error}
                   :blocked #{"bad"})
   (testing "valid keywords"
-    (is (every? log/valid-level? [:trace :debug :info :warn :error :fatal :off])))
+    (is (every? log/valid-level? [:trace :debug :info :warn :error :fatal :off]))
+    (is (not (log/valid-level? :foo))))
   (testing "level resolution"
     (is (= {"foo" :debug
             "foo.bar" :warn
@@ -160,25 +161,51 @@
 (deftest event-logging
   (log/set-level! "foo.bar" :info)
   (testing "log-event"
-    (let [logged (atom [])]
-      (with-redefs [log/config (assoc log/config :outputs {:test {:type :null}})
-                    log/write-output! (fn [id _ event]
-                                        (swap! logged conj [id (:level event) (:logger event)]))]
-        (testing "with bad properties"
-          (is (nil? (log/log-event {:logger 123
-                                    :level :info})))
-          (is (nil? (log/log-event {:logger "foo.bar.baz"
-                                    :level true})))
-          (is (empty? @logged)))
-        (testing "with unmet threshold"
-          (is (nil? (log/log-event {:logger "foo.bar.baz"
-                                    :level :debug})))
-          (is (empty? @logged)))
-        (testing "passed event"
+    (testing "with global levels"
+      (let [logged (atom [])]
+        (with-redefs [log/config (assoc log/config :outputs {:test {:type :null}})
+                      log/write-output! (fn [id _ event]
+                                          (swap! logged conj [id (:level event) (:logger event)]))]
+          (testing "with bad properties"
+            (is (nil? (log/log-event {:logger 123
+                                      :level :info})))
+            (is (nil? (log/log-event {:logger "foo.bar.baz"
+                                      :level true})))
+            (is (empty? @logged)))
+          (testing "with unmet threshold"
+            (is (nil? (log/log-event {:logger "foo.bar.baz"
+                                      :level :debug})))
+            (is (empty? @logged)))
+          (testing "passed event"
+            (is (nil? (log/log-event {:logger "foo.bar.baz"
+                                      :level :info
+                                      :message "heyo"})))
+            (is (= [[:test :info "foo.bar.baz"]] @logged))))))
+    (testing "with output levels"
+      (let [logged (atom [])]
+        (with-redefs [log/config (assoc log/config
+                                        :level :debug
+                                        :outputs {:a {:type :null
+                                                      :level :info
+                                                      :levels {"foo.bar" :warn}}
+                                                  :b {:type :null
+                                                      :level :warn
+                                                      :levels {"foo.bar" :debug}}})
+                      log/write-output! (fn [id _ event]
+                                          (swap! logged conj [id (:level event) (:logger event)]))]
+          (is (nil? (log/log-event {:logger "abc.xyz"
+                                    :level :debug
+                                    :message "ahoy"})))
           (is (nil? (log/log-event {:logger "foo.bar.baz"
                                     :level :info
-                                    :message "heyo"})))
-          (is (= [[:test :info "foo.bar.baz"]] @logged))))))
+                                    :message "bonjour"})))
+          (is (nil? (log/log-event {:logger "foo.bar.qux"
+                                    :level :warn
+                                    :message "guten tag"})))
+          (is (= [[:b :info "foo.bar.baz"]
+                  [:a :warn "foo.bar.qux"]
+                  [:b :warn "foo.bar.qux"]]
+                 @logged))))))
   (testing "-log-slf4j"
     (let [logged (atom [])]
       (with-redefs [log/log-event (fn [event]
@@ -209,11 +236,11 @@
               "should not evaluate arguments when not enabled")
           (is (= [{:level :info
                    :logger "dialog.logger-test"
-                   :line 205
+                   :line 232
                    :message "one two three"}
                   {:level :warn
                    :logger "dialog.logger-test"
-                   :line 206
+                   :line 233
                    :message "string value"}]
                  @logged))
           (swap! logged empty))
@@ -224,11 +251,11 @@
               "should not evaluate arguments when not enabled")
           (is (= [{:level :info
                    :logger "dialog.logger-test"
-                   :line 221
+                   :line 248
                    :message "string value two three"}
                   {:level :error
                    :logger "dialog.logger-test"
-                   :line 222
+                   :line 249
                    :message "a boom happened"
                    :error ex}]
                  @logged))
@@ -242,11 +269,11 @@
               "should not evaluate arguments when not enabled")
           (is (= [{:level :info
                    :logger "dialog.logger-test"
-                   :line 238
+                   :line 265
                    :message "one two three"}
                   {:level :warn
                    :logger "dialog.logger-test"
-                   :line 239
+                   :line 266
                    :message "string value"}]
                  @logged))
           (swap! logged empty))
@@ -257,11 +284,11 @@
               "should not evaluate arguments when not enabled")
           (is (= [{:level :info
                    :logger "dialog.logger-test"
-                   :line 254
+                   :line 281
                    :message "string value"}
                   {:level :error
                    :logger "dialog.logger-test"
-                   :line 255
+                   :line 282
                    :message "a boom happened"
                    :error ex}]
                  @logged))
