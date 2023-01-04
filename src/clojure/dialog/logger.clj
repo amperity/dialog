@@ -113,12 +113,19 @@
   ([logger]
    (match-level (:levels config) logger))
   ([levels logger]
-   (when-let [match (and (seq levels)
-                         (->> levels
-                              (sort-by (comp count key) (comp - compare))
-                              (filter #(prefixed? logger (key %)))
-                              (first)))]
-     (val match))))
+   (let [matched (volatile! nil)]
+     (reduce-kv
+       (fn test-match
+         [^long match-length prefix level]
+         (let [length (count prefix)]
+           (if (and (< match-length length)
+                    (prefixed? logger prefix))
+             (do
+               (vreset! matched level)
+               length)
+             match-length)))
+       0 levels)
+     @matched)))
 
 
 (defn valid-level?

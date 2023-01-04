@@ -17,6 +17,9 @@ This project adheres to [Semantic Versioning](http://semver.org/).
   options, mirroring the global config levels.
   [PR#31](https://github.com/amperity/dialog/pull/31)
 
+### Changed
+- Logger level matching rewritten to be approximately 6x faster.
+
 ### Fixed
 - Cached logger levels are reset when configuration is re-initialized.
   [#26](https://github.com/amperity/dialog/issues/26)
