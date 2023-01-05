@@ -79,4 +79,5 @@
     (assoc opts
            :installer :remote
            :sign-releases? true
+           :pom-file (str class-dir "/META-INF/maven/" lib-name "/pom.xml")
            :artifact jar-file)))

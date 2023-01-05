@@ -24,6 +24,25 @@ elif [[ $1 = javac ]]; then
         echo "Compiling Java class files"
         exec clojure -T:build javac "$@"
     fi
+elif [[ $1 = deploy ]]; then
+    shift
+    if [[ -z $CLOJARS_USERNAME ]]; then
+        read -p "Clojars username: " CLOJARS_USERNAME
+        if [[ -z $CLOJARS_USERNAME ]]; then
+            echo "No username available, aborting" >&2
+            exit 1
+        fi
+        export CLOJARS_USERNAME
+    fi
+    if [[ -z $CLOJARS_PASSWORD ]]; then
+        read -p "Clojars deploy token: " CLOJARS_PASSWORD
+        if [[ -z $CLOJARS_PASSWORD ]]; then
+            echo "No deploy token available, aborting" >&2
+            exit 1
+        fi
+        export CLOJARS_PASSWORD
+    fi
+    exec clojure -T:build deploy "$@"
 else
     exec clojure -T:build "$@"
 fi

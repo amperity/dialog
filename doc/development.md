@@ -53,7 +53,13 @@ bin/build jar
 
 # install to local repo
 bin/build install
+```
 
+To deploy the project to Clojars, use the `deploy` build command. This will
+prompt for your Clojars username and deploy token, or they can be set in the
+environment as `CLOJARS_USERNAME` and `CLOJARS_PASSWORD`, respectively.
+
+```bash
 # deploy to Clojars
 bin/build deploy
 ```

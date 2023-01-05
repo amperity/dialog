@@ -21,7 +21,9 @@
   {:deps {org.clojure/clojure {:mvn/version "1.11.1"}
           org.slf4j/slf4j-api {:mvn/version "1.7.36"}
           org.clojure/tools.build {:mvn/version "0.8.4"}
-          slipset/deps-deploy {:mvn/version "0.2.0"}}
+          ;; TODO: change this back to the main repo once https://github.com/slipset/deps-deploy/pull/53 is merged
+          slipset/deps-deploy {:git/url "https://github.com/greglook/deps-deploy.git"
+                               :git/sha "a138ef59c1239336034c69624458f5b100ac835b"}}
    :ns-default build}
 
   :repl
