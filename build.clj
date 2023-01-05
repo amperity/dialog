@@ -7,7 +7,7 @@
 
 
 (def lib-name 'com.amperity/dialog)
-(def version (str "1.0." (b/git-count-revs nil)))
+(def version (str "1.1." (b/git-count-revs nil)))
 
 (def clojure-src-dir "src/clojure")
 (def java-src-dir "src/java")

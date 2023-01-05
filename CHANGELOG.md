@@ -8,6 +8,11 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+...
+
+
+## [1.1.101] - 2023-01-05
+
 ### Added
 - Custom output writers and formatters can be used by providing a symbol for
   the output's `:type` and `:format` keys. The symbol will be resolved to a var
@@ -99,7 +104,8 @@ stable" version of the library after much production usage.
 Initial release.
 
 
-[Unreleased]: https://github.com/amperity/dialog/compare/1.0.1...HEAD
+[Unreleased]: https://github.com/amperity/dialog/compare/1.1.101...HEAD
+[1.1.101]: https://github.com/amperity/dialog/compare/1.0.1...1.1.101
 [1.0.1]: https://github.com/amperity/dialog/compare/0.3.2...1.0.1
 [0.3.2]: https://github.com/amperity/dialog/compare/0.3.1...0.3.2
 [0.3.1]: https://github.com/amperity/dialog/compare/0.3.0...0.3.1
