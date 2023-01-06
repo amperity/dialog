@@ -11,7 +11,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 ...
 
 
-## [1.1.103] - 2023-01-05
+## [1.1.104] - 2023-01-06
 
 ### Added
 - Custom output writers and formatters can be used by providing a symbol for
@@ -105,8 +105,8 @@ stable" version of the library after much production usage.
 Initial release.
 
 
-[Unreleased]: https://github.com/amperity/dialog/compare/1.1.103...HEAD
-[1.1.103]: https://github.com/amperity/dialog/compare/1.0.1...1.1.103
+[Unreleased]: https://github.com/amperity/dialog/compare/1.1.104...HEAD
+[1.1.104]: https://github.com/amperity/dialog/compare/1.0.1...1.1.104
 [1.0.1]: https://github.com/amperity/dialog/compare/0.3.2...1.0.1
 [0.3.2]: https://github.com/amperity/dialog/compare/0.3.1...0.3.2
 [0.3.1]: https://github.com/amperity/dialog/compare/0.3.0...0.3.1
