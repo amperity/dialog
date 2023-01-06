@@ -36,13 +36,15 @@
 (defn pom
   "Write out a pom.xml file for the project."
   [_]
-  (b/write-pom
-    {:src-pom "doc/pom.xml"
-     :src-dirs [clojure-src-dir]
-     :class-dir class-dir
-     :version version
-     :lib lib-name
-     :basis basis}))
+  (let [commit-sha (b/git-process {:git-args "rev-parse HEAD"})]
+    (b/write-pom
+      {:basis basis
+       :lib lib-name
+       :version version
+       :src-pom "doc/pom.xml"
+       :src-dirs [clojure-src-dir]
+       :class-dir class-dir
+       :scm {:tag commit-sha}})))
 
 
 (defn jar
@@ -76,9 +78,12 @@
   [opts]
   (when-not (.exists (io/file jar-file))
     (jar nil))
-  (d/deploy
-    (assoc opts
-           :installer :remote
-           :sign-releases? true
-           :pom-file (str class-dir "/META-INF/maven/" lib-name "/pom.xml")
-           :artifact jar-file)))
+  (let [pom-file (b/pom-path
+                   {:class-dir class-dir
+                    :lib lib-name})]
+    (d/deploy
+      (assoc opts
+             :installer :remote
+             :sign-releases? true
+             :pom-file pom-file
+             :artifact jar-file))))
