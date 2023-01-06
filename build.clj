@@ -2,6 +2,7 @@
   "Build instructions for dialog."
   (:require
     [clojure.java.io :as io]
+    [clojure.string :as str]
     [clojure.tools.build.api :as b]
     [deps-deploy.deps-deploy :as d]))
 
@@ -26,6 +27,12 @@
 (defn javac
   "Compile Java source files in the project."
   [_]
+  (let [java-version (System/getProperty "java.version")]
+    (when-not (str/starts-with? java-version "1.8")
+      (binding [*out* *err*]
+        (println "Dialog should be compiled with Java 1.8 for maximum"
+                 "compatibility; currently using:" java-version))
+      (System/exit 1)))
   (b/javac
     {:src-dirs [java-src-dir]
      :class-dir class-dir
