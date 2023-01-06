@@ -4,7 +4,7 @@ version: 2.1
 executors:
   clojure:
     docker:
-      - image: cimg/clojure:1.11-openjdk-11.0
+      - image: cimg/clojure:1.11-openjdk-8.0
     working_directory: ~/repo
 
 
