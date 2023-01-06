@@ -37,7 +37,8 @@
   "Write out a pom.xml file for the project."
   [_]
   (b/write-pom
-    {:src-dirs [clojure-src-dir #_java-src-dir]
+    {:src-pom "doc/pom.xml"
+     :src-dirs [clojure-src-dir]
      :class-dir class-dir
      :version version
      :lib lib-name

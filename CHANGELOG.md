@@ -11,7 +11,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 ...
 
 
-## [1.1.101] - 2023-01-05
+## [1.1.103] - 2023-01-05
 
 ### Added
 - Custom output writers and formatters can be used by providing a symbol for
@@ -23,6 +23,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
   [PR#31](https://github.com/amperity/dialog/pull/31)
 
 ### Changed
+- Patch version numbers now count the total number of commits to the repository.
 - Logger level matching rewritten to be approximately 6x faster.
 
 ### Fixed
@@ -104,8 +105,8 @@ stable" version of the library after much production usage.
 Initial release.
 
 
-[Unreleased]: https://github.com/amperity/dialog/compare/1.1.101...HEAD
-[1.1.101]: https://github.com/amperity/dialog/compare/1.0.1...1.1.101
+[Unreleased]: https://github.com/amperity/dialog/compare/1.1.103...HEAD
+[1.1.103]: https://github.com/amperity/dialog/compare/1.0.1...1.1.103
 [1.0.1]: https://github.com/amperity/dialog/compare/0.3.2...1.0.1
 [0.3.2]: https://github.com/amperity/dialog/compare/0.3.1...0.3.2
 [0.3.1]: https://github.com/amperity/dialog/compare/0.3.0...0.3.1
