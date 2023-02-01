@@ -2,12 +2,13 @@
   "Build instructions for dialog."
   (:require
     [clojure.java.io :as io]
+    [clojure.string :as str]
     [clojure.tools.build.api :as b]
     [deps-deploy.deps-deploy :as d]))
 
 
 (def lib-name 'com.amperity/dialog)
-(def version (str "1.0." (b/git-count-revs nil)))
+(def version (str "1.1." (b/git-count-revs nil)))
 
 (def clojure-src-dir "src/clojure")
 (def java-src-dir "src/java")
@@ -26,6 +27,12 @@
 (defn javac
   "Compile Java source files in the project."
   [_]
+  (let [java-version (System/getProperty "java.version")]
+    (when-not (str/starts-with? java-version "1.8")
+      (binding [*out* *err*]
+        (println "Dialog should be compiled with Java 1.8 for maximum"
+                 "compatibility; currently using:" java-version))
+      (System/exit 1)))
   (b/javac
     {:src-dirs [java-src-dir]
      :class-dir class-dir
@@ -36,12 +43,15 @@
 (defn pom
   "Write out a pom.xml file for the project."
   [_]
-  (b/write-pom
-    {:src-dirs [clojure-src-dir #_java-src-dir]
-     :class-dir class-dir
-     :version version
-     :lib lib-name
-     :basis basis}))
+  (let [commit-sha (b/git-process {:git-args "rev-parse HEAD"})]
+    (b/write-pom
+      {:basis basis
+       :lib lib-name
+       :version version
+       :src-pom "doc/pom.xml"
+       :src-dirs [clojure-src-dir]
+       :class-dir class-dir
+       :scm {:tag commit-sha}})))
 
 
 (defn jar
@@ -75,8 +85,12 @@
   [opts]
   (when-not (.exists (io/file jar-file))
     (jar nil))
-  (d/deploy
-    (assoc opts
-           :installer :remote
-           :sign-releases? true
-           :artifact jar-file)))
+  (let [pom-file (b/pom-path
+                   {:class-dir class-dir
+                    :lib lib-name})]
+    (d/deploy
+      (assoc opts
+             :installer :remote
+             :sign-releases? true
+             :pom-file pom-file
+             :artifact jar-file))))

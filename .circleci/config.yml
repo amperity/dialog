@@ -4,7 +4,7 @@ version: 2.1
 executors:
   clojure:
     docker:
-      - image: cimg/clojure:1.11-openjdk-11.0
+      - image: cimg/clojure:1.11-openjdk-8.0
     working_directory: ~/repo
 
 
@@ -38,7 +38,7 @@ jobs:
             unzip clj-kondo-${CLJ_KONDO_VERSION}-linux-amd64.zip
       - run:
           name: Lint source code
-          command: "./clj-kondo --lint src test"
+          command: "./clj-kondo --lint src:test"
 
   misc:
     executor: clojure
@@ -59,8 +59,8 @@ jobs:
           keys:
             - v1-test-{{ checksum "deps.edn" }}
             - v1-test-
-      - run: bin/compile
-      - run: bin/check
+      - run: bin/build javac
+      - run: bin/test check
       - run: bin/test
       - save_cache:
           key: v1-test-{{ checksum "deps.edn" }}
@@ -81,7 +81,7 @@ jobs:
             - v1-test-
       - run:
           name: Generate test coverage
-          command: bin/coverage --codecov
+          command: bin/test coverage --codecov
       - save_cache:
           paths:
             - ~/.m2

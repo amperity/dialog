@@ -8,10 +8,28 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+...
+
+
+## [1.1.104] - 2023-01-06
+
 ### Added
 - Custom output writers and formatters can be used by providing a symbol for
   the output's `:type` and `:format` keys. The symbol will be resolved to a var
   at config time and called with the output map.
+  [PR#20](https://github.com/amperity/dialog/pull/20)
+- Outputs support customized logger levels via the `:level` and `:levels`
+  options, mirroring the global config levels.
+  [PR#31](https://github.com/amperity/dialog/pull/31)
+
+### Changed
+- Patch version numbers now count the total number of commits to the repository.
+- Logger level matching rewritten to be approximately 6x faster.
+
+### Fixed
+- Cached logger levels are reset when configuration is re-initialized.
+  [#26](https://github.com/amperity/dialog/issues/26)
+  [PR#28](https://github.com/amperity/dialog/pull/28)
 
 
 ## [1.0.1] - 2022-06-01
@@ -87,7 +105,8 @@ stable" version of the library after much production usage.
 Initial release.
 
 
-[Unreleased]: https://github.com/amperity/dialog/compare/1.0.1...HEAD
+[Unreleased]: https://github.com/amperity/dialog/compare/1.1.104...HEAD
+[1.1.104]: https://github.com/amperity/dialog/compare/1.0.1...1.1.104
 [1.0.1]: https://github.com/amperity/dialog/compare/0.3.2...1.0.1
 [0.3.2]: https://github.com/amperity/dialog/compare/0.3.1...0.3.2
 [0.3.1]: https://github.com/amperity/dialog/compare/0.3.0...0.3.1

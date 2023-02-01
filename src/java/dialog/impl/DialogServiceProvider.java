@@ -20,7 +20,7 @@ public class DialogServiceProvider implements SLF4JServiceProvider {
      * The value of this field is modified with each major release.
      */
     // to avoid constant folding by the compiler, this field must *not* be final
-    public static String REQUESTED_API_VERSION = "2.0.3"; // !final
+    public static String REQUESTED_API_VERSION = "2.0.6"; // !final
 
     private ILoggerFactory loggerFactory;
     private IMarkerFactory markerFactory;

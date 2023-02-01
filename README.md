@@ -4,6 +4,7 @@ Dialog
 [![CircleCI](https://circleci.com/gh/amperity/dialog.svg?style=shield&circle-token=33a22acf23de36febc517ba16a26d33fefec0a7c)](https://circleci.com/gh/amperity/dialog)
 [![codecov](https://codecov.io/gh/amperity/dialog/branch/main/graph/badge.svg)](https://codecov.io/gh/amperity/dialog)
 [![cljdoc badge](https://cljdoc.org/badge/com.amperity/dialog)](https://cljdoc.org/d/com.amperity/dialog/CURRENT)
+[![Clojars Project](https://img.shields.io/clojars/v/com.amperity/dialog.svg)](https://clojars.org/com.amperity/dialog)
 
 Dialog is a simple and opinionated logging library that implements an
 [SLF4J](https://www.slf4j.org/)-compatible backend in Clojure. This means it is
@@ -21,10 +22,8 @@ tooling.
 
 ## Usage
 
-Releases are published on Clojars; to use the latest version with Leiningen,
-add the following to your project dependencies:
-
-[![Clojars Project](http://clojars.org/com.amperity/dialog/latest-version.svg)](http://clojars.org/com.amperity/dialog)
+Releases are published on Clojars. You can use the latest Maven coordinate, or
+point at the main branch using `deps.edn`.
 
 By default, this will pull in the SLF4J API package as well as redirecting
 `java.util.logging` and `commons-logging` classes to SLF4J. If you're using
@@ -59,6 +58,6 @@ See the [development docs](doc/development.md) for detailed instructions.
 
 ## License
 
-Copyright © 2022 Amperity, Inc.
+Copyright © 2023 Amperity, Inc.
 
 Distributed under the MIT License.

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <name>dialog</name>
+  <description>Simple just-enough logging library for Clojure</description>
+  <url>https://github.com/amperity/dialog</url>
+  <licenses>
+    <license>
+      <name>MIT License</name>
+      <url>http://www.opensource.org/licenses/MIT</url>
+    </license>
+  </licenses>
+  <scm>
+    <url>https://github.com/amperity/dialog</url>
+    <connection>scm:git:git://github.com/amperity/dialog.git</connection>
+    <developerConnection>scm:git:ssh://git@github.com/amperity/dialog.git</developerConnection>
+  </scm>
+</project>

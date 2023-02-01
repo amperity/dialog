@@ -46,11 +46,15 @@
   nil)
 
 
+(declare reset-level-cache!)
+
+
 (defn initialize!
   "Load and initialize the logging system configuration."
   []
   (let [cfg (config/load-config)]
     (alter-var-root #'config (constantly cfg))
+    (reset-level-cache!)
     nil))
 
 
@@ -106,12 +110,22 @@
 (defn- match-level
   "Get the value for the key which is the deepest prefix of the given logger
   name, or nil if no keys prefix the logger."
-  [logger]
-  (when-let [match (->> (:levels config)
-                        (sort-by (comp count key) (comp - compare))
-                        (filter #(prefixed? logger (key %)))
-                        (first))]
-    (val match)))
+  ([logger]
+   (match-level (:levels config) logger))
+  ([levels logger]
+   (let [matched (volatile! nil)]
+     (reduce-kv
+       (fn test-match
+         [^long match-length prefix level]
+         (let [length (count prefix)]
+           (if (and (< match-length length)
+                    (prefixed? logger prefix))
+             (do
+               (vreset! matched level)
+               length)
+             match-length)))
+       0 levels)
+     @matched)))
 
 
 (defn valid-level?
@@ -168,12 +182,18 @@
   (reset-level-cache!))
 
 
-(defn enabled?
-  "True if the given logger is enabled at the provided level."
-  [logger level]
+(defn level-allowed?
+  "True if the logger level meets or exceeds the threshold level."
+  [threshold level]
   (Level/isAllowed
-    (Level/ofKeyword (get-level logger))
+    (Level/ofKeyword threshold)
     (Level/ofKeyword level)))
+
+
+(defn enabled?
+  "True if the named logger is enabled at the provided event level."
+  [logger level]
+  (level-allowed? (get-level logger) level))
 
 
 ;; ## Event Logging
@@ -214,6 +234,13 @@
     middleware))
 
 
+(defn- get-output-level
+  "Determine the output-specific level threshold configured for a logger."
+  [output logger]
+  (or (match-level (:levels output) logger)
+      (:level output)))
+
+
 (defn- write-output!
   "Write an event to an output, applying any configured formatter."
   [id output event]
@@ -245,7 +272,10 @@
       (fn write-event
         [[id output]]
         (when-let [event (apply-middleware event (:middleware output))]
-          (write-output! id output event)))
+          (let [threshold (get-output-level output (:logger event))]
+            (when (or (nil? threshold)
+                      (level-allowed? threshold (:level event)))
+              (write-output! id output event)))))
       (:outputs config))))
 
 

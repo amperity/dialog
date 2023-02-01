@@ -49,7 +49,8 @@
            :main {:stdout {:type :print
                            :stream :stdout
                            :format :simple
-                           :padding false}
+                           :padding false
+                           :levels {"vault.client" :warn}}
                   :loggly {:type :syslog
                            :format :json
                            :middleware [acme.logging/filter-syslog]}}}}
