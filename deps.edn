@@ -22,8 +22,7 @@
   {:deps {org.clojure/clojure {:mvn/version "1.11.1"}
           org.slf4j/slf4j-api {:mvn/version "2.0.6"}
           org.clojure/tools.build {:mvn/version "0.8.4"}
-          slipset/deps-deploy {:git/url "https://github.com/slipset/deps-deploy.git"
-                               :git/sha "fd8ff2de9c4bda82a1c69c387d56217473b394be"}}
+          io.github.slipset/deps-deploy {:git/sha "fd8ff2de9c4bda82a1c69c387d56217473b394be"}}
    :ns-default build}
 
   :repl
