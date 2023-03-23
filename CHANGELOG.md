@@ -8,7 +8,19 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
-...
+This is a **major release** which switches Dialog from the 1.7 SLF4J APIs to
+2.0. Pure Clojure consumers should see little direct change here, but this will
+impact the logging dependencies pulled in.
+
+### Changed
+- Migrate library from SLF4J 1.7 to 2.0.
+  [#18](https://github.com/amperity/dialog/issues/18)
+  [PR#19](https://github.com/amperity/dialog/pull/19) (credit @ieugen)
+- Update other dependency versions.
+
+### Added
+- Include `log4j-over-slf4j` bridge dependency by default.
+  [#32](https://github.com/amperity/dialog/issues/32)
 
 
 ## [1.1.104] - 2023-01-06

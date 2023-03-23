@@ -26,6 +26,9 @@ elif [[ $1 = javac ]]; then
     fi
 elif [[ $1 = deploy ]]; then
     shift
+    if [[ -f ~/.clojure/clojars.env ]]; then
+        source ~/.clojure/clojars.env
+    fi
     if [[ -z $CLOJARS_USERNAME ]]; then
         read -p "Clojars username: " CLOJARS_USERNAME
         if [[ -z $CLOJARS_USERNAME ]]; then
