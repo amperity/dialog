@@ -26,10 +26,9 @@ Releases are published on Clojars. You can use the latest Maven coordinate, or
 point at the main branch using `deps.edn`.
 
 By default, this will pull in the SLF4J API package as well as redirecting
-`java.util.logging` and `commons-logging` classes to SLF4J. If you're using
-libraries developed against log4j, you may also want to add a dependency on
-`org.slf4j/log4j-over-slf4j` as well. For more information, see the
-[SLF4J legacy bridging](https://www.slf4j.org/legacy.html) documentation.
+`java.util.logging`, `commons-logging`, and `log4j` classes to SLF4J. For more
+information, see the [SLF4J legacy bridging](https://www.slf4j.org/legacy.html)
+documentation.
 
 Within your code, you can use the standard `clojure.tools.logging` approach to
 logging and things should Just Work. If for some reason you don't want to pull

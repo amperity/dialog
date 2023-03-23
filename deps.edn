@@ -1,6 +1,6 @@
 {:paths
- ["src/clojure"
-  "resources"
+ ["resources"
+  "src/clojure"
   "target/classes"]
 
  :deps

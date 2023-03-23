@@ -14,7 +14,7 @@ find-latest() {
 }
 
 if [[ $1 = clean ]]; then
-    rm -rf target
+    rm -rf *.pom.asc target
 elif [[ $1 = hiera ]]; then
     shift
     exec clojure -X:hiera "$@"
