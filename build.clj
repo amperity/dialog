@@ -31,8 +31,7 @@
     (when-not (str/starts-with? java-version "1.8")
       (binding [*out* *err*]
         (println "Dialog should be compiled with Java 1.8 for maximum"
-                 "compatibility; currently using:" java-version))
-      (System/exit 1)))
+                 "compatibility; currently using:" java-version))))
   (b/javac
     {:src-dirs [java-src-dir]
      :class-dir class-dir

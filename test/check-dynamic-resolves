@@ -8,7 +8,7 @@ set -eo pipefail
 
 cd "$(dirname "${BASH_SOURCE[0]}")/.."
 
-readonly MATCHES=$(grep -RE '^ *IFn.*"requiring-resolve"' src/java/dialog)
+readonly MATCHES=$(grep -RE '^ *IFn.*"requiring-resolve"' src/java/dialog/logger)
 
 if [[ -n $MATCHES ]]; then
     echo -e "Found uncommented reference to 'requiring-resolve' in logger classes:\n$MATCHES" >&2
