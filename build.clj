@@ -11,6 +11,7 @@
 (def lib-name 'com.amperity/dialog)
 (def base-version "2.0")
 
+(def resources-dir "resources")
 (def clojure-src-dir "src/clojure")
 (def java-src-dir "src/java")
 (def class-dir "target/classes")
@@ -96,7 +97,7 @@
   (let [opts (-> opts javac pom)
         jar-file (jar-path opts)]
     (b/copy-dir
-      {:src-dirs [clojure-src-dir]
+      {:src-dirs [resources-dir clojure-src-dir]
        :target-dir class-dir})
     (b/jar
       {:class-dir class-dir
