@@ -8,6 +8,11 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+...
+
+
+## [2.0.115] - 2023-03-24
+
 This is a **major release** which switches Dialog from the 1.7 SLF4J APIs to
 2.0. Pure Clojure consumers should see little direct change here, but this will
 impact the logging dependencies pulled in.
@@ -117,7 +122,8 @@ stable" version of the library after much production usage.
 Initial release.
 
 
-[Unreleased]: https://github.com/amperity/dialog/compare/1.1.104...HEAD
+[Unreleased]: https://github.com/amperity/dialog/compare/2.0.115...HEAD
+[2.0.115]: https://github.com/amperity/dialog/compare/1.1.104...2.0.115
 [1.1.104]: https://github.com/amperity/dialog/compare/1.0.1...1.1.104
 [1.0.1]: https://github.com/amperity/dialog/compare/0.3.2...1.0.1
 [0.3.2]: https://github.com/amperity/dialog/compare/0.3.1...0.3.2
