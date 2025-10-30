@@ -2,9 +2,10 @@
   "Log format which presents events in ANSI-colored text, suitable for human
   consumption in a REPL console."
   (:require
+    [clj-commons.ansi :as ansi]
+    [clj-commons.format.exceptions :as ex]
     [clojure.string :as str]
-    [io.aviso.ansi :as ansi]
-    [io.aviso.exception :as ex])
+    [dialog.util :as util])
   (:import
     (java.time
       LocalDateTime
@@ -35,7 +36,7 @@
   "Pad a string on the right with spaces to make it fit a certain visual width."
   [string width]
   (if (pos-int? width)
-    (let [vlen (ansi/visual-length string)]
+    (let [vlen (util/visual-length string)]
       (if (<= width vlen)
         string
         (apply str string (repeat (- width vlen) " "))))
@@ -61,12 +62,12 @@
   "Format a thread name for printing."
   [thread]
   (str "["
-       (ansi/green
-         (if thread
-           (if (str/starts-with? (str/lower-case thread) "nrepl-session-")
-             "nREPL"
-             thread)
-           "-"))
+       (ansi/compose [:green
+                      (if thread
+                        (if (str/starts-with? (str/lower-case thread) "nrepl-session-")
+                          "nREPL"
+                          thread)
+                        "-")])
        "]"))
 
 
@@ -75,41 +76,41 @@
   [level]
   (let [level-str (str/upper-case (name level))]
     (case level
-      :fatal (ansi/bold-magenta level-str)
-      :error (ansi/bold-red level-str)
-      :warn (ansi/red level-str)
-      :info (ansi/blue level-str)
+      :fatal (ansi/compose [:bold.magenta level-str])
+      :error (ansi/compose [:bold.red] level-str)
+      :warn (ansi/compose [:red level-str])
+      :info (ansi/compose [:blue level-str])
       level-str)))
 
 
 (defn- format-logger
   "Format a logger name to fit within the desired max length."
   [logger max-length]
-  (ansi/cyan
-    (cond
-      ;; Don't do trimming
-      (not (pos-int? max-length))
-      logger
+  (ansi/compose [:cyan
+                 (cond
+                   ;; Don't do trimming
+                   (not (pos-int? max-length))
+                   logger
 
-      ;; Logger name fits in limit
-      (<= (count logger) max-length)
-      logger
+                   ;; Logger name fits in limit
+                   (<= (count logger) max-length)
+                   logger
 
-      ;; Collapse logger segments
-      :else
-      (loop [collapsed []
-             parts (str/split logger #"\.")]
-        (let [candidate (str/join "." (concat collapsed parts))]
-          (if (< max-length (count candidate))
-            ;; Need to trim more.
-            (if-let [next-part (first parts)]
-              ;; Collapse next part in the ns into a single character.
-              (recur (conj collapsed (subs next-part 0 1))
-                     (rest parts))
-              ;; No more parts, just truncate it.
-              (subs candidate 0 max-length))
-            ;; Abbreviated logger fits within limit.
-            candidate))))))
+                   ;; Collapse logger segments
+                   :else
+                   (loop [collapsed []
+                          parts (str/split logger #"\.")]
+                     (let [candidate (str/join "." (concat collapsed parts))]
+                       (if (< max-length (count candidate))
+                         ;; Need to trim more.
+                         (if-let [next-part (first parts)]
+                           ;; Collapse next part in the ns into a single character.
+                           (recur (conj collapsed (subs next-part 0 1))
+                                  (rest parts))
+                           ;; No more parts, just truncate it.
+                           (subs candidate 0 max-length))
+                         ;; Abbreviated logger fits within limit.
+                         candidate))))]))
 
 
 (defn formatter
@@ -158,7 +159,7 @@
           (str " " tail))
         ;; Extra Data
         (when-let [extra (:dialog.format/extra (meta event))]
-          (str "  " (ansi/cyan (pr-str extra))))
+          (str "  " (ansi/compose [:cyan (pr-str extra)])))
         ;; Exceptions
         (when-let [ex (:error event)]
           (str "\n" (ex/format-exception ex)))))))
