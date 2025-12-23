@@ -1,7 +1,7 @@
 Dialog
 ======
 
-[![CircleCI](https://circleci.com/gh/amperity/dialog.svg?style=shield&circle-token=33a22acf23de36febc517ba16a26d33fefec0a7c)](https://circleci.com/gh/amperity/dialog)
+[![CircleCI](https://dl.circleci.com/status-badge/img/gh/amperity/dialog/tree/main.svg?style=svg)](https://dl.circleci.com/status-badge/redirect/gh/amperity/dialog/tree/main)
 [![codecov](https://codecov.io/gh/amperity/dialog/branch/main/graph/badge.svg)](https://codecov.io/gh/amperity/dialog)
 [![cljdoc badge](https://cljdoc.org/badge/com.amperity/dialog)](https://cljdoc.org/d/com.amperity/dialog/CURRENT)
 [![Clojars Project](https://img.shields.io/clojars/v/com.amperity/dialog.svg)](https://clojars.org/com.amperity/dialog)
