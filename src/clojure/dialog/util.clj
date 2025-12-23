@@ -1,5 +1,7 @@
 (ns ^:no-doc dialog.util
   "Implementation utilities."
+  (:require
+    [clojure.string :as str])
   (:import
     java.net.InetAddress))
 
@@ -93,3 +95,18 @@
                          "localhost"))]
         (reset! hostname-ref hostname)
         hostname)))
+
+
+(def ^:const ^:private ansi-pattern #"\e\[.*?m")
+
+
+(defn strip-ansi
+  "Removes ANSI codes from a string, returning just the raw text."
+  ^String [string]
+  (str/replace string ansi-pattern ""))
+
+
+(defn visual-length
+  "Returns the length of the string, with ANSI codes stripped out."
+  [string]
+  (-> string strip-ansi .length))

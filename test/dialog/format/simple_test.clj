@@ -3,7 +3,7 @@
     [clojure.string :as str]
     [clojure.test :refer [deftest testing is]]
     [dialog.format.simple :as simple]
-    [io.aviso.ansi :as ansi])
+    [dialog.util :as util])
   (:import
     java.time.Instant))
 
@@ -74,7 +74,7 @@
           "custom extra info shows"))
     (testing "throwables"
       (let [ex (RuntimeException. "BOOM")
-            message (ansi/strip-ansi
+            message (util/strip-ansi
                       (fmt {:level :error
                             :logger "foo.bar.baz"
                             :error ex}))]
