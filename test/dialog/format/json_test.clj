@@ -1,8 +1,8 @@
 (ns dialog.format.json-test
   (:require
+    [clj-time.core :as time]
     [clojure.string :as str]
     [clojure.test :refer [deftest testing is]]
-    [clj-time.core :as time]
     [dialog.format.json :as json])
   (:import
     java.time.Instant))
@@ -50,6 +50,6 @@
             event {:date-time date-time}]
         (with-redefs [json/default-write-fn (fn [& _] (throw (Exception. "default-write-fn called")))]
           (is (thrown? Exception #"^default-write-fn called$"
-                (fmt event))))
+                       (fmt event))))
         (is (= "{\"date-time\":\"2025-05-05T00:00:00.000Z\"}"
                (fmt {:date-time date-time})))))))
