@@ -3,7 +3,7 @@
     [clojure.string :as str]
     [clojure.test :refer [deftest testing is]]
     [dialog.format.pretty :as pretty]
-    [io.aviso.ansi :as ansi])
+    [dialog.util :as util])
   (:import
     java.time.Instant))
 
@@ -23,14 +23,14 @@
 
 
 (deftest thread-formatting
-  (let [format-thread (comp ansi/strip-ansi #'pretty/format-thread)]
+  (let [format-thread (comp util/strip-ansi #'pretty/format-thread)]
     (is (= "[-]" (format-thread nil)))
     (is (= "[main]" (format-thread "main")))
     (is (= "[nREPL]" (format-thread "nREPL-session-1234-5678-90ab")))))
 
 
 (deftest level-formatting
-  (let [format-level (comp ansi/strip-ansi #'pretty/format-level)]
+  (let [format-level (comp util/strip-ansi #'pretty/format-level)]
     (is (= "TRACE" (format-level :trace)))
     (is (= "DEBUG" (format-level :debug)))
     (is (= "INFO"  (format-level :info)))
@@ -40,7 +40,7 @@
 
 
 (deftest logger-formatting
-  (let [format-logger (comp ansi/strip-ansi #'pretty/format-logger)]
+  (let [format-logger (comp util/strip-ansi #'pretty/format-logger)]
     (is (= "one" (format-logger "one" 30)))
     (is (= "one" (format-logger "one" 3)))
     (is (= "o" (format-logger "one" 2)))
@@ -52,7 +52,7 @@
 
 
 (deftest message-formatting
-  (let [fmt (comp ansi/strip-ansi (pretty/formatter {}))
+  (let [fmt (comp util/strip-ansi (pretty/formatter {}))
         inst (Instant/parse "2021-12-27T15:33:18Z")]
     (testing "basic format"
       (is (= "2021-12-27T15:33:18Z [thread-pool-123]        INFO  foo.bar.baz                     Hello, logger!"
@@ -106,7 +106,7 @@
                           :error ex})]
         (is (str/includes? message "java.lang.RuntimeException: BOOM"))))
     (testing "with custom padding"
-      (let [fmt (comp ansi/strip-ansi (pretty/formatter {:padding {:thread 10, :logger 15}}))]
+      (let [fmt (comp util/strip-ansi (pretty/formatter {:padding {:thread 10, :logger 15}}))]
         (is (= "2021-12-27T15:33:18Z [main]     INFO  acme.main        Hello, logger!"
                (fmt {:time inst
                      :level :info
@@ -114,7 +114,7 @@
                      :message "Hello, logger!"
                      :thread "main"})))))
     (testing "without padding"
-      (let [fmt (comp ansi/strip-ansi (pretty/formatter {:padding false}))]
+      (let [fmt (comp util/strip-ansi (pretty/formatter {:padding false}))]
         (is (= "2021-12-27T15:33:18Z [thread-pool-123] INFO foo.bar.baz  Hello, logger!"
                (fmt {:time inst
                      :level :info

@@ -1,8 +1,8 @@
 (ns dialog.format.json
   "Log format which presents events as JSON objects for structured logging."
   (:require
-    [clojure.data.json :as json]
-    [io.aviso.exception :as ex]))
+    [clj-commons.format.exceptions :as ex]
+    [clojure.data.json :as json]))
 
 
 (defn- key-fn
