@@ -62,12 +62,13 @@
   "Format a thread name for printing."
   [thread]
   (str "["
-       (ansi/compose [:green
-                      (if thread
-                        (if (str/starts-with? (str/lower-case thread) "nrepl-session-")
-                          "nREPL"
-                          thread)
-                        "-")])
+       (ansi/compose
+         [:green
+          (if thread
+            (if (str/starts-with? (str/lower-case thread) "nrepl-session-")
+              "nREPL"
+              thread)
+            "-")])
        "]"))
 
 
@@ -86,31 +87,32 @@
 (defn- format-logger
   "Format a logger name to fit within the desired max length."
   [logger max-length]
-  (ansi/compose [:cyan
-                 (cond
-                   ;; Don't do trimming
-                   (not (pos-int? max-length))
-                   logger
+  (ansi/compose
+    [:cyan
+     (cond
+       ;; Don't do trimming
+       (not (pos-int? max-length))
+       logger
 
-                   ;; Logger name fits in limit
-                   (<= (count logger) max-length)
-                   logger
+       ;; Logger name fits in limit
+       (<= (count logger) max-length)
+       logger
 
-                   ;; Collapse logger segments
-                   :else
-                   (loop [collapsed []
-                          parts (str/split logger #"\.")]
-                     (let [candidate (str/join "." (concat collapsed parts))]
-                       (if (< max-length (count candidate))
-                         ;; Need to trim more.
-                         (if-let [next-part (first parts)]
-                           ;; Collapse next part in the ns into a single character.
-                           (recur (conj collapsed (subs next-part 0 1))
-                                  (rest parts))
-                           ;; No more parts, just truncate it.
-                           (subs candidate 0 max-length))
-                         ;; Abbreviated logger fits within limit.
-                         candidate))))]))
+       ;; Collapse logger segments
+       :else
+       (loop [collapsed []
+              parts (str/split logger #"\.")]
+         (let [candidate (str/join "." (concat collapsed parts))]
+           (if (< max-length (count candidate))
+             ;; Need to trim more.
+             (if-let [next-part (first parts)]
+               ;; Collapse next part in the ns into a single character.
+               (recur (conj collapsed (subs next-part 0 1))
+                      (rest parts))
+               ;; No more parts, just truncate it.
+               (subs candidate 0 max-length))
+             ;; Abbreviated logger fits within limit.
+             candidate))))]))
 
 
 (defn formatter
