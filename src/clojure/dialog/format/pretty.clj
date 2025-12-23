@@ -136,30 +136,31 @@
         format-time (timestamp-formatter (:timestamp output :full))]
     (fn format-message
       [event]
-      (str
-        ;; Timestamp
-        (format-time (:time event))
-        " "
-        ;; Thread
-        (rpad (format-thread (:thread event)) thread-width)
-        " "
-        ;; Level
-        (rpad (format-level (:level event)) level-width)
-        " "
-        ;; Logger
-        (rpad (format-logger (str (:logger event)) logger-width) logger-width)
-        "  "
-        ;; Message
-        (or (:message event) "-")
-        ;; Duration
-        (when-let [duration (:duration event)]
-          (format " (%.3f ms)" duration))
-        ;; Custom trailer
-        (when-let [tail (:dialog.format/tail (meta event))]
-          (str " " tail))
-        ;; Extra Data
-        (when-let [extra (:dialog.format/extra (meta event))]
-          (str "  " (ansi/compose [:cyan (pr-str extra)])))
-        ;; Exceptions
-        (when-let [ex (:error event)]
-          (str "\n" (ex/format-exception ex)))))))
+      (binding [ansi/*color-enabled* true]
+        (str
+          ;; Timestamp
+          (format-time (:time event))
+          " "
+          ;; Thread
+          (rpad (format-thread (:thread event)) thread-width)
+          " "
+          ;; Level
+          (rpad (format-level (:level event)) level-width)
+          " "
+          ;; Logger
+          (rpad (format-logger (str (:logger event)) logger-width) logger-width)
+          "  "
+          ;; Message
+          (or (:message event) "-")
+          ;; Duration
+          (when-let [duration (:duration event)]
+            (format " (%.3f ms)" duration))
+          ;; Custom trailer
+          (when-let [tail (:dialog.format/tail (meta event))]
+            (str " " tail))
+          ;; Extra Data
+          (when-let [extra (:dialog.format/extra (meta event))]
+            (str "  " (ansi/compose [:cyan (pr-str extra)])))
+          ;; Exceptions
+          (when-let [ex (:error event)]
+            (str "\n" (ex/format-exception ex))))))))
