@@ -8,7 +8,10 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
-...
+### Changed
+- Update dependencies to latest versions, including `pretty`
+  dependency which has moved to `clj-commons` with some breaking changes.
+  [#39](https://github.com/amperity/dialog/pull/39) (credit @sundbp)
 
 
 ## [2.0.115] - 2023-03-24
