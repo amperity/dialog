@@ -5,7 +5,7 @@
 
  :deps
  {org.clojure/clojure {:mvn/version "1.11.1"}
-  org.clojure/data.json {:mvn/version "2.4.0"}
+  org.clojure/data.json {:mvn/version "2.5.1"}
   org.slf4j/slf4j-api {:mvn/version "2.0.7"}
   org.slf4j/jul-to-slf4j {:mvn/version "2.0.7"}
   org.slf4j/jcl-over-slf4j {:mvn/version "2.0.7"}
@@ -43,7 +43,8 @@
 
   :test
   {:extra-paths ["test"]
-   :extra-deps {lambdaisland/kaocha {:mvn/version "1.80.1274"}}
+   :extra-deps {lambdaisland/kaocha {:mvn/version "1.80.1274"}
+                clj-time/clj-time {:mvn/version "0.15.2"}}
    :jvm-opts ["-XX:-OmitStackTraceInFastThrow"
               "-Duser.language=en"
               "-Duser.country=US"]

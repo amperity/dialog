@@ -8,7 +8,12 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
-...
+### Changed
+- The `:json` formatter now handles objects that aren't JSON serializiable
+  by calling `clojure.core/str` on them and writing the resulting string.
+  Previously, these values would cause the event to be dropped with a warning similar to
+  `[dialog output error] Failed to write to output stdout: Don't know how to write JSON of class <class>`.
+- Update `clojure.data.json` dependency.
 
 
 ## [2.0.115] - 2023-03-24

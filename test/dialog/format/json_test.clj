@@ -2,6 +2,7 @@
   (:require
     [clojure.string :as str]
     [clojure.test :refer [deftest testing is]]
+    [clj-time.core :as time]
     [dialog.format.json :as json])
   (:import
     java.time.Instant))
@@ -43,4 +44,12 @@
     (testing "throwables"
       (let [ex (RuntimeException. "BOOM")
             message (fmt {:error ex})]
-        (is (str/starts-with? message "{\"error\":[{\"class-name\":\"java.lang.RuntimeException\","))))))
+        (is (str/starts-with? message "{\"error\":[{\"class-name\":\"java.lang.RuntimeException\","))))
+    (testing "types that don't implement JSONWriter"
+      (let [date-time (time/date-time 2025 5 5)
+            event {:date-time date-time}]
+        (with-redefs [json/default-write-fn (fn [& _] (throw (Exception. "default-write-fn called")))]
+          (is (thrown? Exception #"^default-write-fn called$"
+                (fmt event))))
+        (is (= "{\"date-time\":\"2025-05-05T00:00:00.000Z\"}"
+               (fmt {:date-time date-time})))))))
