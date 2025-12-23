@@ -52,7 +52,8 @@
 
   :coverage
   {:extra-paths ["test"]
-   :extra-deps {cloverage/cloverage {:mvn/version "RELEASE"}}
+   :extra-deps {cloverage/cloverage {:mvn/version "RELEASE"}
+                clj-time/clj-time {:mvn/version "0.15.2"}}
    :jvm-opts ["-Duser.language=en"
               "-Duser.country=US"]
    :main-opts ["-m" "cloverage.coverage"
