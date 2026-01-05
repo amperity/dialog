@@ -8,6 +8,11 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+...
+
+
+## [2.0.122] - 2026-01-06
+
 ### Changed
 - Update dependencies to latest versions, including `pretty`
   dependency which has moved to `clj-commons` with some breaking changes.
