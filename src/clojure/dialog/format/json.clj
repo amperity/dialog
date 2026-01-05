@@ -75,6 +75,14 @@
      (str v))))
 
 
+(defn- default-write-fn
+  "Default write handler for any types that don't implement
+  `clojure.data.json/JSONWriter`: just calls `str` on the value and writes the
+  resulting string."
+  [value out options]
+  (json/-write (str value) out options))
+
+
 (defn formatter
   "Construct a JSON event formatting function."
   [_output]
@@ -84,4 +92,5 @@
       event
       :key-fn key-fn
       :value-fn value-fn
+      :default-write-fn default-write-fn
       :escape-slash false)))

@@ -12,6 +12,11 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - Update dependencies to latest versions, including `pretty`
   dependency which has moved to `clj-commons` with some breaking changes.
   [#39](https://github.com/amperity/dialog/pull/39) (credit @sundbp)
+- The `:json` formatter now handles objects that aren't JSON serializable
+  by calling `clojure.core/str` on them and writing the resulting string.
+  Previously, these values would cause the event to be dropped with a warning similar to
+  `[dialog output error] Failed to write to output stdout: Don't know how to write JSON of class <class>`.
+  [#41](https://github.com/amperity/dialog/pull/41)
 
 
 ## [2.0.115] - 2023-03-24
